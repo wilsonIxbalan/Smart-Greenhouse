@@ -1,0 +1,45 @@
+import { Bell, Moon, Sun } from 'lucide-react'
+import { Link, Outlet } from 'react-router'
+import { BottomNav } from '@/app/layouts/BottomNav'
+import { SideNav } from '@/app/layouts/SideNav'
+import { useTheme } from '@/app/theme'
+import { Button } from '@/components/ui/button'
+
+export function AppLayout() {
+  const { theme, toggleTheme } = useTheme()
+
+  return (
+    <div className="flex min-h-dvh flex-col">
+      <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b bg-background/90 px-4 backdrop-blur">
+        <Link to="/" className="font-semibold">
+          Invernadero
+        </Link>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" asChild className="size-11 lg:hidden">
+            <Link to="/alertas" aria-label="Alertas">
+              <Bell />
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-11"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
+          >
+            {theme === 'dark' ? <Sun /> : <Moon />}
+          </Button>
+        </div>
+      </header>
+
+      <div className="flex flex-1">
+        <SideNav />
+        <main className="mx-auto w-full max-w-7xl min-w-0 flex-1 px-4 py-4 pb-24 lg:px-8 lg:py-6 lg:pb-8">
+          <Outlet />
+        </main>
+      </div>
+
+      <BottomNav />
+    </div>
+  )
+}

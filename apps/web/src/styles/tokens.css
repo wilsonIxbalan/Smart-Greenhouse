@@ -1,0 +1,54 @@
+/* Única fuente de color, tipografía y radios. Concepto "hoja + cobre": cobre solo para lo electrónico. */
+:root {
+  --radius: 0.75rem;
+  --font-sans: 'Geist Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --background: #f5f8f4;
+  --foreground: #0f1f18;
+  --card: #ffffff;
+  --card-foreground: #0f1f18;
+  --popover: #ffffff;
+  --popover-foreground: #0f1f18;
+  --primary: #1f9d6b;
+  --primary-foreground: #0b1511;
+  --secondary: #e8efea;
+  --secondary-foreground: #0f1f18;
+  --muted: #e8efea;
+  --muted-foreground: #4a5e54;
+  --accent: #e8efea;
+  --accent-foreground: #0f1f18;
+  --border: #d5e0d9;
+  --input: #d5e0d9;
+  --ring: #1f9d6b;
+  --copper: #a8622a;
+  --water: #1e88c9;
+  --warning: #b87700;
+  --critical: #c43c3c;
+  --on-status: #ffffff;
+}
+
+.dark {
+  --background: #0b1511;
+  --foreground: #e6efe9;
+  --card: #13211b;
+  --card-foreground: #e6efe9;
+  --popover: #13211b;
+  --popover-foreground: #e6efe9;
+  --primary: #34c38a;
+  --primary-foreground: #0b1511;
+  --secondary: #1a2c24;
+  --secondary-foreground: #e6efe9;
+  --muted: #1a2c24;
+  --muted-foreground: #9fb3a8;
+  --accent: #1a2c24;
+  --accent-foreground: #e6efe9;
+  --border: #22352c;
+  --input: #22352c;
+  --ring: #34c38a;
+  --copper: #e0955a;
+  --water: #4fb3e8;
+  --warning: #f5b23d;
+  --critical: #f07272;
+  --on-status: #0b1511;
+}
