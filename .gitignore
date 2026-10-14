@@ -23,7 +23,7 @@ build/
 .DS_Store
 Thumbs.db
 
-# Se mantienen fuera de git (Wilson los respalda aparte)
+# Se mantienen fuera de git documentacion se versiona fuera
 docs/
 state/
 supabase/

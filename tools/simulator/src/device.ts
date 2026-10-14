@@ -15,8 +15,7 @@ interface ManualOverride {
 }
 
 /**
- * Emula al Mega: trama del generador + overrides manuales con TTL, interlocks (BR-I01, BR-I02)
- * e idempotencia por id (BR-C05). `now` en segundos desde el arranque.
+ * Emula al Mega: trama del generador + overrides manuales con TTL.
  */
 export class SimulatedDevice {
   private manual = new Map<Actuator, ManualOverride>()

@@ -2,6 +2,7 @@ import type { SoilAptitude, Telemetry } from '@inv/contracts'
 import type { StatusTone } from '@/components/shared/StatusChip'
 import { THRESHOLDS } from '@/config/thresholds'
 import type { InfoKey } from '@/content/electronics/types'
+import type { HistoryColumn } from '@/lib/supabase/types'
 import { adcToVolts, soilVerdict } from '@/lib/sensors'
 
 export type MetricTone = 'primary' | 'water' | 'copper' | 'warning' | 'critical'
@@ -28,8 +29,8 @@ export interface MetricDef {
   details?: (f: Telemetry) => MetricDetail[]
   badge?: (f: Telemetry) => { tone: StatusTone; label: string }
   note?: string
-  /** Aparece como serie en la gráfica de 24 h. */
-  chart?: boolean
+  /** Columna de `reading_history`: si existe, la métrica aparece en la gráfica de 24 h. */
+  historyColumn?: HistoryColumn
 }
 
 const dht = (f: Telemetry): MetricAvailability => (f.dht_ok ? 'ok' : 'no-reading')
@@ -56,7 +57,7 @@ export const METRICS = [
     availability: dht,
     threshold: { value: THRESHOLDS.airTempMaxC, label: 'Ventilar' },
     alert: (f) => f.dht_ok === 1 && f.aire_t > THRESHOLDS.airTempMaxC,
-    chart: true,
+    historyColumn: 'aire_t',
   },
   {
     key: 'airHumidity',
@@ -69,7 +70,7 @@ export const METRICS = [
     availability: dht,
     threshold: { value: THRESHOLDS.airHumidityMax, label: 'Ventilar' },
     alert: (f) => f.dht_ok === 1 && f.aire_h > THRESHOLDS.airHumidityMax,
-    chart: true,
+    historyColumn: 'aire_h',
   },
   {
     key: 'soilHumidity',
@@ -84,7 +85,7 @@ export const METRICS = [
     threshold: { value: THRESHOLDS.soilIrrigateOn, label: 'Regar' },
     alert: (f) => f.suelo_ok === 1 && f.suelo_h < THRESHOLDS.soilIrrigateOn,
     secondary: (f) => (f.bomba ? 'Regando' : `Riego bajo ${THRESHOLDS.soilIrrigateOn} %`),
-    chart: true,
+    historyColumn: 'suelo_h',
   },
   {
     key: 'light',
@@ -97,7 +98,7 @@ export const METRICS = [
     availability: (f) => (f.lux < 0 ? 'no-sensor' : 'ok'),
     threshold: { value: THRESHOLDS.lightMinLux, label: 'Encender luz' },
     secondary: (f) => (f.luz > 0 ? `Luz artificial ${f.luz} %` : 'Luz artificial apagada'),
-    chart: true,
+    historyColumn: 'lux',
   },
   {
     key: 'mq135',
@@ -110,7 +111,7 @@ export const METRICS = [
     threshold: { value: THRESHOLDS.mq135MaxAdc, label: 'Aire malo' },
     alert: (f) => f.aire_mq135 > THRESHOLDS.mq135MaxAdc,
     secondary: (f) => volts(f.aire_mq135),
-    chart: true,
+    historyColumn: 'aire_mq135',
   },
   {
     key: 'mq7',
@@ -123,7 +124,7 @@ export const METRICS = [
     threshold: { value: THRESHOLDS.mq7MaxAdc, label: 'CO alto' },
     alert: (f) => f.co > THRESHOLDS.mq7MaxAdc,
     secondary: (f) => volts(f.co),
-    chart: true,
+    historyColumn: 'co',
   },
   {
     key: 'soilPh',

@@ -1,20 +1,27 @@
-import type { RouteObject } from 'react-router'
+import { Navigate, type RouteObject } from 'react-router'
 import { AppLayout } from '@/app/layouts/AppLayout'
+import { LoginPage } from '@/features/auth/LoginPage'
+import { RequireAuth } from '@/features/auth/RequireAuth'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { ElectronicsPage } from '@/features/electronics-page/ElectronicsPage'
 import { PlaceholderPage } from '@/features/placeholder/PlaceholderPage'
 
 export const routes: RouteObject[] = [
-  { path: '/login', element: <PlaceholderPage title="Iniciar sesión" block="B6" /> },
+  { path: '/login', element: <LoginPage /> },
   {
-    element: <AppLayout />,
+    element: <RequireAuth />,
     children: [
-      { index: true, element: <DashboardPage /> },
-      { path: 'control', element: <PlaceholderPage title="Control" block="B9" /> },
-      { path: 'analitica', element: <PlaceholderPage title="Analítica" block="B13" /> },
-      { path: 'alertas', element: <PlaceholderPage title="Alertas" block="B12" /> },
-      { path: 'electronica', element: <ElectronicsPage /> },
-      { path: 'admin/usuarios', element: <PlaceholderPage title="Usuarios" block="B15" /> },
+      {
+        element: <AppLayout />,
+        children: [
+          { index: true, element: <DashboardPage /> },
+          { path: 'control', element: <PlaceholderPage title="Control" block="R7" /> },
+          { path: 'analitica', element: <PlaceholderPage title="Analítica" block="R10" /> },
+          { path: 'alertas', element: <PlaceholderPage title="Alertas" block="R9" /> },
+          { path: 'electronica', element: <ElectronicsPage /> },
+          { path: '*', element: <Navigate to="/" replace /> },
+        ],
+      },
     ],
   },
 ]

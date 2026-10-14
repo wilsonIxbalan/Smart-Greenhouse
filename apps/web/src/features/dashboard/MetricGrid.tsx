@@ -13,7 +13,7 @@ interface MetricGridProps {
 
 export function MetricGrid({ frame, stale, ageLabel, onInfo }: MetricGridProps) {
   return (
-    <div data-testid="metric-grid" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div data-testid="metric-grid" className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {METRICS.map((def) => {
         const view = evaluateMetric(def, frame)
         return (

@@ -52,12 +52,12 @@ export function InfoElectronicaDrawer({ infoKey, frame, onClose }: InfoElectroni
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90dvh]">
+      <DrawerContent className="data-[vaul-drawer-direction=bottom]:max-h-[90dvh]">
         <DrawerHeader>
           <DrawerTitle className="text-copper">{info?.title ?? 'Info Electrónica'}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        <div className="overflow-y-auto px-4 pb-6">
+        <div className="min-w-0 overflow-y-auto px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
           {info && <InfoTabs info={info} frame={frame} />}
         </div>
       </DrawerContent>

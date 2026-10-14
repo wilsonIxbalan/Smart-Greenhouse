@@ -1,20 +1,13 @@
-import { QueryClientProvider, type QueryClient } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
 import { makeQueryClient } from '@/app/query-client'
-import { createDataSource, DataSourceContext, type DataSource } from '@/lib/data-source'
+import { AuthProvider } from '@/features/auth/AuthProvider'
 
-interface AppProvidersProps {
-  children: ReactNode
-  dataSource?: DataSource
-  queryClient?: QueryClient
-}
-
-export function AppProviders({ children, dataSource, queryClient }: AppProvidersProps) {
-  const [ds] = useState(() => dataSource ?? createDataSource())
-  const [qc] = useState(() => queryClient ?? makeQueryClient())
+export function AppProviders({ children }: { children: ReactNode }) {
+  const [qc] = useState(makeQueryClient)
   return (
     <QueryClientProvider client={qc}>
-      <DataSourceContext.Provider value={ds}>{children}</DataSourceContext.Provider>
+      <AuthProvider>{children}</AuthProvider>
     </QueryClientProvider>
   )
 }

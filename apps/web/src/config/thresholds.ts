@@ -18,14 +18,14 @@ export const SOIL_PH = {
 /** Electrónica del Mega: ADC de 10 bits referido a 5 V. */
 export const ADC = { maxCount: 1023, vref: 5 } as const
 
-/** BR-S01/S02: una lectura con más de 30 s se considera vieja / dispositivo sin conexión. */
+/** BR-S01/S02: la trama llega cada ~10 s (Q-31); más de 30 s sin datos = dato viejo / sin conexión. */
 export const STALE_AFTER_MS = 30_000
 
 export const TIMING = {
-  frameIntervalMs: 2_000,
-  historyStepMs: 5 * 60_000,
-  historyRangeMs: { '24h': 24 * 3_600_000 },
-  mockAckDelayMs: 800,
+  /** Gráfica: `reading_history` promedia por bloques; la API devuelve máx. 1000 filas. */
+  history: { hours: 24, bucketMinutes: 5, refetchMs: 5 * 60_000 },
+  deviceStatusRefetchMs: 60_000,
+  requestTimeoutMs: 15_000,
   commandTimeoutMs: 10_000,
   clockTickMs: 1_000,
 } as const

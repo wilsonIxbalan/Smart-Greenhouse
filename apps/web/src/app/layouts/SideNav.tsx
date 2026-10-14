@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router'
 import { bottomNav, secondaryNav, type NavItem } from '@/config/nav'
+import { useAllowedNav } from '@/features/auth/hooks'
 import { cn } from '@/lib/utils'
 
 function SideNavList({ items }: { items: readonly NavItem[] }) {
@@ -29,15 +30,19 @@ function SideNavList({ items }: { items: readonly NavItem[] }) {
 }
 
 export function SideNav() {
+  const primary = useAllowedNav(bottomNav)
+  const secondary = useAllowedNav(secondaryNav)
   return (
     <nav
       aria-label="Menú lateral"
       className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-60 shrink-0 flex-col gap-4 border-r px-3 py-4 lg:flex"
     >
-      <SideNavList items={bottomNav} />
-      <div className="border-t pt-4">
-        <SideNavList items={secondaryNav} />
-      </div>
+      <SideNavList items={primary} />
+      {secondary.length > 0 && (
+        <div className="border-t pt-4">
+          <SideNavList items={secondary} />
+        </div>
+      )}
     </nav>
   )
 }

@@ -34,8 +34,8 @@ export function ElectronicsPage() {
           />
         ) : !frame ? (
           <EmptyState
-            title="Aún no hay lecturas"
-            description="Las fórmulas y la vista lógica funcionan sin datos en vivo."
+            title="Sin lecturas todavía"
+            description="El dispositivo o el simulador aún no envía datos. Las fórmulas y la vista lógica funcionan sin datos en vivo."
           />
         ) : null}
       </div>
