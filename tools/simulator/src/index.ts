@@ -74,12 +74,16 @@ function runCloud() {
     if (polling) return
     polling = true
     try {
+      let applied = false
       for (const cmd of await link.pullCommands()) {
         const ack = device.handleLine(cmd.wire, now()) ?? { ack: cmd.id, ok: 0, err: 'BAD_CMD' }
         await link.ack(ack)
+        applied ||= ack.ok === 1
         const result = ack.ok ? 'ok' : `rechazado (${'err' in ack ? ack.err : '?'})`
         console.log(`${stamp()} ↓ ${cmd.wire} → ACK ${result}`)
       }
+      // Tras un comando ejecutado se envía la trama enseguida: la web ve el cambio sin esperar 10 s.
+      if (applied) await sendFrame()
     } catch (e) {
       console.error(`${stamp()} ✗ ${(e as Error).message}`)
     } finally {

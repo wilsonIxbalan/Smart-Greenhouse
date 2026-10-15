@@ -1,7 +1,10 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { SectionHeader } from '@/components/shared/SectionHeader'
+import { Button } from '@/components/ui/button'
 import type { InfoKey } from '@/content/electronics/types'
+import { usePermissions } from '@/features/auth/hooks'
 import { ActuatorSummary } from '@/features/dashboard/ActuatorSummary'
 import { AlertBanner } from '@/features/dashboard/AlertBanner'
 import { DashboardSkeleton } from '@/features/dashboard/DashboardSkeleton'
@@ -11,17 +14,15 @@ import { useDeviceStatus, useLatestReading } from '@/features/dashboard/hooks'
 import { MetricGrid } from '@/features/dashboard/MetricGrid'
 import { NoReadingsState } from '@/features/dashboard/NoReadingsState'
 import { InfoElectronicaDrawer } from '@/features/electronics/InfoElectronicaDrawer'
-import { formatAge, isStale } from '@/lib/sensors'
+import { formatAge, isStale, latestTimestamp } from '@/lib/sensors'
 import { useNow } from '@/lib/use-now'
-
-const latestOf = (a: number | null | undefined, b: number | null | undefined) =>
-  a == null ? (b ?? null) : b == null ? a : Math.max(a, b)
 
 export function DashboardPage() {
   const latest = useLatestReading()
   const device = useDeviceStatus()
   const now = useNow()
   const [infoKey, setInfoKey] = useState<InfoKey | null>(null)
+  const { can } = usePermissions()
 
   if (latest.isPending) return <DashboardSkeleton />
   if (latest.isError) {
@@ -35,7 +36,7 @@ export function DashboardPage() {
   }
 
   const reading = latest.data
-  const lastSeenAt = latestOf(reading?.receivedAt, device.data?.lastSeenAt)
+  const lastSeenAt = latestTimestamp(reading?.receivedAt, device.data?.lastSeenAt)
   const online = !isStale(lastSeenAt, now)
   const statusBar = (
     <DeviceStatusBar
@@ -80,8 +81,18 @@ export function DashboardPage() {
         <HistorySection />
 
         <section className="min-w-0 space-y-3">
-          <SectionHeader title="Actuadores" description="Estado confirmado por el Mega" />
-          <ActuatorSummary frame={reading.frame} />
+          <SectionHeader
+            title="Actuadores"
+            description="Estado confirmado por el Mega"
+            action={
+              can('actuators.control') && (
+                <Button variant="outline" size="sm" className="min-h-11" asChild>
+                  <Link to="/control">Controlar</Link>
+                </Button>
+              )
+            }
+          />
+          <ActuatorSummary reading={reading} now={now} />
         </section>
       </div>
 

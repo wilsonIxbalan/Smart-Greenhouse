@@ -26,6 +26,7 @@ export const TIMING = {
   history: { hours: 24, bucketMinutes: 5, refetchMs: 5 * 60_000 },
   deviceStatusRefetchMs: 60_000,
   requestTimeoutMs: 15_000,
-  commandTimeoutMs: 10_000,
   clockTickMs: 1_000,
+  /** Comandos: respaldo de consulta mientras uno espera ACK, ventana visible y vida del aviso final. */
+  command: { pollMs: 3_000, windowMinutes: 10, feedbackMs: 2 * 60_000 },
 } as const

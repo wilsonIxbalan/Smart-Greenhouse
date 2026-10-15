@@ -41,3 +41,12 @@ export function formatAge(ms: number): string {
   if (h < 24) return `hace ${h} h`
   return `hace ${Math.floor(h / 24)} d`
 }
+
+/** El más reciente de dos instantes (trama en caché vs `last_seen_at`); null si no hay ninguno. */
+export function latestTimestamp(
+  a: number | null | undefined,
+  b: number | null | undefined,
+): number | null {
+  if (a == null) return b ?? null
+  return b == null ? a : Math.max(a, b)
+}

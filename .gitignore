@@ -24,10 +24,11 @@ build/
 Thumbs.db
 
 # Se mantienen fuera de git documentacion se versiona fuera
-docs/
-state/
-supabase/
-.claude/
-.codex/
-CLAUDE.md
-AGENTS.md
+# (con "/" inicial: solo las carpetas de la raíz; sin él, supabase/ también ocultaba apps/web/src/lib/supabase)
+/docs/
+/state/
+/supabase/
+/.claude/
+/.codex/
+/CLAUDE.md
+/AGENTS.md

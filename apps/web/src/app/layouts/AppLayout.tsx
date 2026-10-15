@@ -6,6 +6,7 @@ import { useTheme } from '@/app/theme'
 import { Button } from '@/components/ui/button'
 import { ROLE_LABEL } from '@/config/permissions'
 import { useProfile, useSignOut } from '@/features/auth/hooks'
+import { useLiveCommands } from '@/features/control/hooks'
 import { useLiveReadings } from '@/features/dashboard/hooks'
 
 export function AppLayout() {
@@ -13,6 +14,7 @@ export function AppLayout() {
   const { data: profile } = useProfile()
   const signOut = useSignOut()
   useLiveReadings()
+  useLiveCommands()
 
   return (
     <div className="flex min-h-dvh flex-col">

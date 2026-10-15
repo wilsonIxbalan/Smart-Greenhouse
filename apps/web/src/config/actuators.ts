@@ -1,58 +1,84 @@
 import type { Actuator, Telemetry } from '@inv/contracts'
 import { Bell, DoorOpen, Droplets, Fan, Lightbulb, PanelTop, type LucideIcon } from 'lucide-react'
 
+/** Cómo se controla: coincide con los tipos de comando del contrato (switch, level, angle). */
+export type ActuatorControl =
+  | { kind: 'switch' }
+  | { kind: 'level'; min: number; max: number; step: number }
+  | { kind: 'angle'; presets: readonly number[] }
+
 export interface ActuatorDef {
   key: Actuator
   label: string
   icon: LucideIcon
-  /** Estado confirmado por la telemetría, en texto. */
-  describe: (f: Telemetry) => string
-  isActive: (f: Telemetry) => boolean
+  control: ActuatorControl
+  /** Valor confirmado por la telemetría (0/1, % o grados). */
+  value: (f: Telemetry) => number
+  /** Valor en texto, para la tarjeta y la descripción de un comando. */
+  format: (value: number) => string
+  /** BR-C07: si devuelve texto, el comando pide confirmación explícita antes de enviarse. */
+  confirm?: (value: number) => string | null
 }
 
+const onOff = (on: string, off: string) => (v: number) => (v ? on : off)
 const angle = (deg: number) => (deg > 0 ? `Abierta ${deg}°` : 'Cerrada')
 
-export const ACTUATORS_UI = [
+export const ACTUATORS_UI: readonly ActuatorDef[] = [
   {
     key: 'bomba',
     label: 'Bomba de riego',
     icon: Droplets,
-    describe: (f) => (f.bomba ? 'Encendida' : 'Apagada'),
-    isActive: (f) => f.bomba === 1,
+    control: { kind: 'switch' },
+    value: (f) => f.bomba,
+    format: onOff('Encendida', 'Apagada'),
+    confirm: (v) =>
+      v
+        ? 'La bomba regará en modo manual aunque el suelo esté húmedo. Si el depósito no tiene agua, el Mega rechazará el comando.'
+        : null,
   },
   {
     key: 'vent',
     label: 'Ventilador',
     icon: Fan,
-    describe: (f) => (f.vent ? 'Encendido' : 'Apagado'),
-    isActive: (f) => f.vent === 1,
+    control: { kind: 'switch' },
+    value: (f) => f.vent,
+    format: onOff('Encendido', 'Apagado'),
   },
   {
     key: 'luz',
     label: 'Luz artificial',
     icon: Lightbulb,
-    describe: (f) => (f.luz > 0 ? `${f.luz} %` : 'Apagada'),
-    isActive: (f) => f.luz > 0,
+    control: { kind: 'level', min: 0, max: 100, step: 5 },
+    value: (f) => f.luz,
+    format: (v) => (v > 0 ? `${v} %` : 'Apagada'),
   },
   {
     key: 'ventana',
     label: 'Ventana',
     icon: PanelTop,
-    describe: (f) => angle(f.ventana),
-    isActive: (f) => f.ventana > 0,
+    control: { kind: 'angle', presets: [0, 45, 90] },
+    value: (f) => f.ventana,
+    format: angle,
   },
   {
     key: 'puerta',
     label: 'Puerta',
     icon: DoorOpen,
-    describe: (f) => angle(f.puerta),
-    isActive: (f) => f.puerta > 0,
+    control: { kind: 'angle', presets: [0, 45, 90] },
+    value: (f) => f.puerta,
+    format: angle,
+    confirm: (v) =>
+      v > 0
+        ? `El servo abrirá la puerta a ${v}°. Verifica que no haya nada en su recorrido.`
+        : null,
   },
   {
     key: 'alarma',
     label: 'Alarma',
     icon: Bell,
-    describe: (f) => (f.alarma ? 'Encendida' : 'Apagada'),
-    isActive: (f) => f.alarma === 1,
+    control: { kind: 'switch' },
+    value: (f) => f.alarma,
+    format: onOff('Encendida', 'Apagada'),
+    confirm: (v) => (v ? 'La alarma (buzzer y LED) sonará en el invernadero.' : null),
   },
-] as const satisfies readonly ActuatorDef[]
+]
