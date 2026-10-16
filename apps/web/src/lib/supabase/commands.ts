@@ -40,7 +40,7 @@ export function toCommandRow(row: unknown): CommandRow | null {
   return parsed.data
 }
 
-// Mensajes que lanza issue_command() (07_rpc_user.sql).
+// Mensajes que lanza issue_command()
 const RPC_ERRORS: Record<string, string> = {
   forbidden: 'Tu usuario no tiene permiso para enviar comandos o está inactivo.',
   unknown_device: 'El dispositivo no existe o está desactivado.',

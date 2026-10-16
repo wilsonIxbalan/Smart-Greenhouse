@@ -2,6 +2,7 @@ import { Navigate, type RouteObject } from 'react-router'
 import { AppLayout } from '@/app/layouts/AppLayout'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RequireAuth } from '@/features/auth/RequireAuth'
+import { AlertsPage } from '@/features/alerts/AlertsPage'
 import { ControlPage } from '@/features/control/ControlPage'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { ElectronicsPage } from '@/features/electronics-page/ElectronicsPage'
@@ -18,7 +19,7 @@ export const routes: RouteObject[] = [
           { index: true, element: <DashboardPage /> },
           { path: 'control', element: <ControlPage /> },
           { path: 'analitica', element: <PlaceholderPage title="Analítica" block="R10" /> },
-          { path: 'alertas', element: <PlaceholderPage title="Alertas" block="R9" /> },
+          { path: 'alertas', element: <AlertsPage /> },
           { path: 'electronica', element: <ElectronicsPage /> },
           { path: '*', element: <Navigate to="/" replace /> },
         ],

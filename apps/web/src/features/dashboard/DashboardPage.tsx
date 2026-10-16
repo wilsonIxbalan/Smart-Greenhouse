@@ -4,6 +4,7 @@ import { ErrorState } from '@/components/shared/ErrorState'
 import { SectionHeader } from '@/components/shared/SectionHeader'
 import { Button } from '@/components/ui/button'
 import type { InfoKey } from '@/content/electronics/types'
+import { useOpenAlertCount } from '@/features/alerts/hooks'
 import { usePermissions } from '@/features/auth/hooks'
 import { ActuatorSummary } from '@/features/dashboard/ActuatorSummary'
 import { AlertBanner } from '@/features/dashboard/AlertBanner'
@@ -23,6 +24,7 @@ export function DashboardPage() {
   const now = useNow()
   const [infoKey, setInfoKey] = useState<InfoKey | null>(null)
   const { can } = usePermissions()
+  const openAlerts = useOpenAlertCount()
 
   if (latest.isPending) return <DashboardSkeleton />
   if (latest.isError) {
@@ -43,7 +45,7 @@ export function DashboardPage() {
       online={online}
       lastSeenAt={lastSeenAt}
       now={now}
-      {...(device.data ? { openAlerts: device.data.openAlerts } : {})}
+      openAlerts={openAlerts.count}
     />
   )
 

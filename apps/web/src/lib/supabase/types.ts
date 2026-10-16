@@ -44,6 +44,31 @@ export interface CommandRow extends CommandRequest {
   resolvedAt: number | null
 }
 
+export const ALERT_TYPES = [
+  'co_high',
+  'air_high',
+  'no_water',
+  'soil_no_reading',
+  'soil_unfit',
+] as const
+export type AlertType = (typeof ALERT_TYPES)[number]
+
+export const ALERT_SEVERITIES = ['info', 'warning', 'critical'] as const
+export type AlertSeverity = (typeof ALERT_SEVERITIES)[number]
+
+/** Fila de `alerts`: la abre y la resuelve la nube (evaluate_reading); el usuario solo la reconoce. */
+export interface AlertRow {
+  id: number
+  type: AlertType
+  severity: AlertSeverity
+  message: string
+  value: number | null
+  createdAt: number
+  acknowledgedBy: string | null
+  acknowledgedAt: number | null
+  resolvedAt: number | null
+}
+
 export interface Profile {
   id: string
   email: string | null

@@ -6,6 +6,8 @@ import { useTheme } from '@/app/theme'
 import { Button } from '@/components/ui/button'
 import { ROLE_LABEL } from '@/config/permissions'
 import { useProfile, useSignOut } from '@/features/auth/hooks'
+import { useLiveAlerts } from '@/features/alerts/hooks'
+import { OpenAlertsBadge } from '@/features/alerts/OpenAlertsBadge'
 import { useLiveCommands } from '@/features/control/hooks'
 import { useLiveReadings } from '@/features/dashboard/hooks'
 
@@ -15,6 +17,7 @@ export function AppLayout() {
   const signOut = useSignOut()
   useLiveReadings()
   useLiveCommands()
+  useLiveAlerts()
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -28,9 +31,10 @@ export function AppLayout() {
               {profile.fullName ?? profile.email} · {ROLE_LABEL[profile.role]}
             </span>
           )}
-          <Button variant="ghost" size="icon" asChild className="size-11 lg:hidden">
+          <Button variant="ghost" size="icon" asChild className="relative size-11 lg:hidden">
             <Link to="/alertas" aria-label="Alertas">
               <Bell />
+              <OpenAlertsBadge className="absolute top-1 right-0.5" />
             </Link>
           </Button>
           <Button

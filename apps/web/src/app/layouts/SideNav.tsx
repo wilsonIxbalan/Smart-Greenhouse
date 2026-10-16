@@ -1,12 +1,13 @@
 import { NavLink } from 'react-router'
 import { bottomNav, secondaryNav, type NavItem } from '@/config/nav'
+import { OpenAlertsBadge } from '@/features/alerts/OpenAlertsBadge'
 import { useAllowedNav } from '@/features/auth/hooks'
 import { cn } from '@/lib/utils'
 
 function SideNavList({ items }: { items: readonly NavItem[] }) {
   return (
     <ul className="flex flex-col gap-1">
-      {items.map(({ to, label, icon: Icon }) => (
+      {items.map(({ to, label, icon: Icon, badge }) => (
         <li key={to}>
           <NavLink
             to={to}
@@ -22,6 +23,7 @@ function SideNavList({ items }: { items: readonly NavItem[] }) {
           >
             <Icon aria-hidden className="size-5" />
             {label}
+            {badge === 'openAlerts' && <OpenAlertsBadge className="ml-auto" />}
           </NavLink>
         </li>
       ))}

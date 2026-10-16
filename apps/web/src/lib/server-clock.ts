@@ -1,7 +1,3 @@
-/**
- * Q-34: "dato viejo" y la cuenta regresiva del modo manual se miden con la hora del servidor, no con el
- * reloj del celular. El desfase se estima con `v_device_status` (last_seen_at + seconds_since_seen).
- */
 const MIN_CHANGE_MS = 1500
 
 let offsetMs = 0

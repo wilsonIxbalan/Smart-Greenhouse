@@ -19,7 +19,7 @@ export function lastCommandFor(commands: readonly CommandRow[], act: Actuator): 
 }
 
 /**
- * BR-C06: en curso siempre se muestra. Confirmado, hasta que llega una trama posterior al ACK
+ * En curso siempre se muestra. Confirmado, hasta que llega una trama posterior al ACK
  * (desde ahí la tarjeta ya muestra el estado real). Rechazado o expirado, durante un par de minutos.
  */
 export function isFeedbackVisible(c: CommandRow, reading: Reading | null, now: number): boolean {

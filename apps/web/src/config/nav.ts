@@ -7,6 +7,8 @@ export interface NavItem {
   icon: LucideIcon
   /** Si se define, el destino solo aparece para los roles con ese permiso. */
   permission?: Permission
+  /** Contador junto a la etiqueta (por ahora solo alertas abiertas). */
+  badge?: 'openAlerts'
 }
 
 /** Destinos principales: nav inferior en móvil y primer grupo del menú lateral en escritorio. */
@@ -18,4 +20,6 @@ export const bottomNav: readonly NavItem[] = [
 ]
 
 /** Destinos secundarios: solo en el menú lateral de escritorio. */
-export const secondaryNav: readonly NavItem[] = [{ to: '/alertas', label: 'Alertas', icon: Bell }]
+export const secondaryNav: readonly NavItem[] = [
+  { to: '/alertas', label: 'Alertas', icon: Bell, badge: 'openAlerts' },
+]
