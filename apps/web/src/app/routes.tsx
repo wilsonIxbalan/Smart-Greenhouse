@@ -1,26 +1,59 @@
+import type { ComponentType } from 'react'
 import { Navigate, type RouteObject } from 'react-router'
 import { AppLayout } from '@/app/layouts/AppLayout'
+import { PageFallback } from '@/app/layouts/PageFallback'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RequireAuth } from '@/features/auth/RequireAuth'
-import { AlertsPage } from '@/features/alerts/AlertsPage'
-import { ControlPage } from '@/features/control/ControlPage'
-import { DashboardPage } from '@/features/dashboard/DashboardPage'
-import { ElectronicsPage } from '@/features/electronics-page/ElectronicsPage'
-import { PlaceholderPage } from '@/features/placeholder/PlaceholderPage'
+
+/** Cada pantalla se descarga al visitarla (Recharts, KaTeX y jsPDF no van en la carga inicial). */
+const page =
+  <M,>(load: () => Promise<M>, pick: (m: M) => ComponentType) =>
+  async () => ({ Component: pick(await load()) })
 
 export const routes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
   {
     element: <RequireAuth />,
+    HydrateFallback: PageFallback,
     children: [
       {
         element: <AppLayout />,
         children: [
-          { index: true, element: <DashboardPage /> },
-          { path: 'control', element: <ControlPage /> },
-          { path: 'analitica', element: <PlaceholderPage title="Analítica" block="R10" /> },
-          { path: 'alertas', element: <AlertsPage /> },
-          { path: 'electronica', element: <ElectronicsPage /> },
+          {
+            index: true,
+            lazy: page(
+              () => import('@/features/dashboard/DashboardPage'),
+              (m) => m.DashboardPage,
+            ),
+          },
+          {
+            path: 'control',
+            lazy: page(
+              () => import('@/features/control/ControlPage'),
+              (m) => m.ControlPage,
+            ),
+          },
+          {
+            path: 'analitica',
+            lazy: page(
+              () => import('@/features/analytics/AnalyticsPage'),
+              (m) => m.AnalyticsPage,
+            ),
+          },
+          {
+            path: 'alertas',
+            lazy: page(
+              () => import('@/features/alerts/AlertsPage'),
+              (m) => m.AlertsPage,
+            ),
+          },
+          {
+            path: 'electronica',
+            lazy: page(
+              () => import('@/features/electronics-page/ElectronicsPage'),
+              (m) => m.ElectronicsPage,
+            ),
+          },
           { path: '*', element: <Navigate to="/" replace /> },
         ],
       },

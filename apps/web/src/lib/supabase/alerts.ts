@@ -55,6 +55,23 @@ export async function fetchAlerts(deviceId: string, sinceMs: number): Promise<Al
   return (data as unknown[]).map(toAlertRow).filter((r): r is AlertRow => r !== null)
 }
 
+/** Alertas abiertas desde `sinceMs` (analítica y reporte), de la más vieja a la más nueva. */
+export async function fetchAlertsCreatedSince(
+  deviceId: string,
+  sinceMs: number,
+  limit: number,
+): Promise<AlertRow[]> {
+  const { data, error } = await getSupabase()
+    .from('alerts')
+    .select(COLUMNS)
+    .eq('device_id', deviceId)
+    .gte('created_at', new Date(sinceMs).toISOString())
+    .order('id', { ascending: true })
+    .limit(limit)
+  if (error) throw dataError('No se pudieron leer las alertas del periodo', error)
+  return (data as unknown[]).map(toAlertRow).filter((r): r is AlertRow => r !== null)
+}
+
 const RPC_ERRORS: Record<string, string> = {
   forbidden: 'Tu usuario no tiene permiso para reconocer alertas o está inactivo.',
   unknown_alert: 'La alerta ya no existe.',

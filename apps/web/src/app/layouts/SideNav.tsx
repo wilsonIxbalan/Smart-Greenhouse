@@ -37,7 +37,7 @@ export function SideNav() {
   return (
     <nav
       aria-label="Menú lateral"
-      className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-60 shrink-0 flex-col gap-4 border-r px-3 py-4 lg:flex"
+      className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] hidden h-[calc(100dvh-3.5rem-env(safe-area-inset-top))] w-60 shrink-0 flex-col gap-4 border-r px-3 py-4 lg:flex"
     >
       <SideNavList items={primary} />
       {secondary.length > 0 && (

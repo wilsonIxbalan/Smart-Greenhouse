@@ -3,19 +3,11 @@ import { StatusChip } from '@/components/shared/StatusChip'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ALERT_TYPES_UI, SEVERITY_UI } from '@/config/alerts'
-import { formatAge } from '@/lib/sensors'
+import { formatAge, formatDuration } from '@/lib/sensors'
 import type { AlertRow } from '@/lib/supabase/types'
 import { cn } from '@/lib/utils'
 
 const clock = new Intl.DateTimeFormat('es-GT', { dateStyle: 'short', timeStyle: 'short' })
-
-function formatDuration(ms: number): string {
-  const min = Math.round(ms / 60_000)
-  if (min < 1) return 'menos de 1 min'
-  if (min < 60) return `${min} min`
-  const h = Math.floor(min / 60)
-  return min % 60 ? `${h} h ${min % 60} min` : `${h} h`
-}
 
 interface AlertItemProps {
   alert: AlertRow

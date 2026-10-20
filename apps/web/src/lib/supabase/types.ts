@@ -14,6 +14,29 @@ export type HistoryColumn = (typeof HISTORY_COLUMNS)[number]
 /** Un bloque del historial: inicio (ms epoch), muestras y promedios (null = sin lectura válida). */
 export type HistoryPoint = { t: number; samples: number } & Record<HistoryColumn, number | null>
 
+/** Columnas de `readings_hourly` (agregados por hora que calcula pg_cron). */
+export const HOURLY_COLUMNS = [
+  'aire_t_avg',
+  'aire_t_min',
+  'aire_t_max',
+  'aire_h_avg',
+  'suelo_h_avg',
+  'suelo_h_min',
+  'suelo_h_max',
+  'ph_avg',
+  'ec_avg',
+  'lux_avg',
+  'mq135_avg',
+  'mq135_max',
+  'co_avg',
+  'co_max',
+  'bomba_on_ratio',
+] as const
+export type HourlyColumn = (typeof HOURLY_COLUMNS)[number]
+
+/** Una hora agregada: inicio (ms epoch), tramas recibidas y valores (null = sin lectura válida). */
+export type HourlyPoint = { t: number; samples: number } & Record<HourlyColumn, number | null>
+
 export interface DeviceStatus {
   online: boolean
   lastSeenAt: number | null

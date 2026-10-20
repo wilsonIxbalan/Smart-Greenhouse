@@ -2,3 +2,7 @@ packages:
   - 'apps/*'
   - 'packages/*'
   - 'tools/*'
+
+# core-js (dependencia de jspdf) solo trae un script de publicidad: no se ejecuta.
+allowBuilds:
+  core-js: false

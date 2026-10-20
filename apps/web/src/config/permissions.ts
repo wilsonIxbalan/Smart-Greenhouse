@@ -11,6 +11,7 @@ export const PERMISSIONS = {
   'data.view': ['admin', 'operador'],
   'actuators.control': ['admin', 'operador'],
   'alerts.ack': ['admin', 'operador'],
+  'report.send': ['admin', 'operador'],
   'audit.view': ['admin'],
 } as const satisfies Record<string, readonly Role[]>
 
