@@ -1,4 +1,5 @@
 import {
+  ackCommand,
   DEFAULT_TTL_S,
   generateTelemetry,
   parseCommand,
@@ -64,7 +65,7 @@ export class SimulatedDevice {
     if (cmd.kind === 'auto') {
       if (cmd.act) this.manual.delete(cmd.act)
       else this.manual.clear()
-      return { ack: cmd.id, ok: 1 }
+      return { ack: cmd.id, ok: 1, cmd: ackCommand(cmd) }
     }
     if (cmd.kind === 'switch' && cmd.act === 'bomba' && cmd.on && current.agua === 0) {
       return { ack: cmd.id, ok: 0, err: 'NO_WATER' }
@@ -74,6 +75,6 @@ export class SimulatedDevice {
     }
     const value = cmd.kind === 'switch' ? (cmd.on ? 1 : 0) : cmd.val
     this.manual.set(cmd.act, { value, expiresAt: now + (cmd.ttl ?? DEFAULT_TTL_S) })
-    return { ack: cmd.id, ok: 1 }
+    return { ack: cmd.id, ok: 1, cmd: ackCommand(cmd) }
   }
 }

@@ -42,6 +42,7 @@ export const COMMAND_ERROR_TEXT: Record<string, string> = {
   INTERLOCK_CO: 'gas o CO alto: el Mega mantiene la ventilación encendida',
   BAD_CMD: 'el Mega no reconoció el comando',
   BAD_VAL: 'valor fuera de rango para el Mega',
+  MISMATCH: 'el Mega entendió otro comando (posible ruido en el cable); revisa el estado real',
   NO_ACK: 'el Mega no respondió después de 3 intentos',
   NOT_TAKEN: 'el dispositivo no lo tomó en 30 s (¿está en línea?)',
 }

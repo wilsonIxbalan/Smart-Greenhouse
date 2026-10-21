@@ -41,8 +41,14 @@ export const commandSchema = z.discriminatedUnion('kind', [
 ])
 export type Command = z.infer<typeof commandSchema>
 
+// Con ok:1 el Mega repite lo que interpretó (`VENTANA 90 600`); la nube lo compara con lo enviado.
+export const ackCmdSchema = z
+  .string()
+  .max(32)
+  .regex(/^[A-Z0-9]+( [A-Z0-9]+)*$/)
+
 export const ackSchema = z.union([
-  z.object({ ack: z.number().int().positive(), ok: z.literal(1) }).strict(),
+  z.object({ ack: z.number().int().positive(), ok: z.literal(1), cmd: ackCmdSchema }).strict(),
   z.object({ ack: z.number().int().positive(), ok: z.literal(0), err: errorCodeSchema }).strict(),
 ])
 export type Ack = z.infer<typeof ackSchema>
@@ -71,6 +77,11 @@ export function formatCommand(cmd: Command): string {
     case 'auto':
       return cmd.act ? `${head} AUTO ${WIRE_NAME[cmd.act]}` : `${head} AUTO`
   }
+}
+
+/** Lo que el Mega devuelve en `cmd`: la línea sin `#id`. */
+export function ackCommand(cmd: Command): string {
+  return formatCommand(cmd).replace(/^#\d+ /, '')
 }
 
 /** Interpreta una línea `#id CMD [val] [ttl]`. Devuelve null si no es válida. */

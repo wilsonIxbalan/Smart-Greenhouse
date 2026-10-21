@@ -12,7 +12,7 @@ Mega RX1 (D19) ◄────────────────── GPIO17 
 | --- | --- |
 | Envía la última trama del Mega a `device_ingest` | cada 10 s, y enseguida después de un ACK ok |
 | Pide comandos a `device_pull_commands` y los escribe al Mega (`#507 BOMBA ON 600`) | cada 2,5 s |
-| Reenvía cada ACK del Mega (`{"ack":507,"ok":1}`) a `device_ack` | al recibirlo; si no hay red, reintenta |
+| Reenvía cada ACK del Mega (`{"ack":507,"ok":1,"cmd":"BOMBA ON 600"}`) a `device_ack` | al recibirlo; si no hay red, reintenta |
 
 No guarda tramas sin conexión: la hora oficial es la de llegada al servidor y el `seq` ya cuenta las perdidas.
 Si el Mega deja de enviar tramas (más de 10 s), tampoco pide comandos: así la web los marca "Expiró". Ante un

@@ -164,7 +164,7 @@ void procesarLinea(String l) {
   DeserializationError err = deserializeJson(doc, l);
   if (err || !doc.is<JsonObject>()) { Serial.println("[mega] JSON invalido: " + l); return; }
 
-  if (doc["ack"].is<long>()) {                // ACK: {"ack":507,"ok":1} | {"ack":508,"ok":0,"err":"NO_WATER"}
+  if (doc["ack"].is<long>()) {                // ACK: {"ack":507,"ok":1,"cmd":"BOMBA ON 600"} |{"ack":508,"ok":0,"err":"NO_WATER"}
     String ack;
     serializeJson(doc, ack);
     encolarAck(doc["ack"].as<long>(), ack);
