@@ -29,7 +29,7 @@ export function AlertBanner({ frame }: { frame: Telemetry }) {
                 a.tone === 'critical' ? 'text-critical' : 'text-warning',
               )}
             />
-            <div>
+            <div className="min-w-0 break-words">
               <p className="font-medium">{a.title}</p>
               <p className="text-sm text-muted-foreground">{a.description}</p>
             </div>

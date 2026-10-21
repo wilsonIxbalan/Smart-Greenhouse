@@ -1,5 +1,8 @@
 import type { Telemetry } from '@inv/contracts'
+import { Droplets, Sprout, Wind, type LucideIcon } from 'lucide-react'
+import type { StatusTone } from '@/components/shared/StatusChip'
 import { THRESHOLDS } from '@/config/thresholds'
+import type { AlertSeverity, AlertType } from '@/lib/supabase/types'
 
 export interface AlertDef {
   key: string
@@ -40,3 +43,21 @@ export const DASHBOARD_ALERTS = [
     when: (f) => f.dht_ok === 0,
   },
 ] as const satisfies readonly AlertDef[]
+
+/** Alertas guardadas en la nube (`alerts.type`): las abre y resuelve la base con cada lectura. */
+export const ALERT_TYPES_UI: Record<AlertType, { title: string; icon: LucideIcon }> = {
+  co_high: { title: 'Monóxido de carbono alto (MQ-7)', icon: Wind },
+  air_high: { title: 'Calidad del aire baja (MQ-135)', icon: Wind },
+  no_water: { title: 'Depósito sin agua', icon: Droplets },
+  soil_no_reading: { title: 'Sensor de suelo sin lectura', icon: Sprout },
+  soil_unfit: { title: 'Suelo no apto', icon: Sprout },
+}
+
+export const SEVERITY_UI: Record<AlertSeverity, { label: string; tone: StatusTone }> = {
+  info: { label: 'Aviso', tone: 'neutral' },
+  warning: { label: 'Advertencia', tone: 'warning' },
+  critical: { label: 'Crítica', tone: 'critical' },
+}
+
+/** Pestaña "Historial": abiertas + las creadas en los últimos días. */
+export const ALERT_HISTORY_DAYS = 7

@@ -8,7 +8,9 @@ export function makeQueryClient() {
       queries: {
         retry: 3,
         retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, MAX_RETRY_DELAY_MS),
+        // re-sincroniza al volver a la pestaña o al recuperar la red
         refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
       },
     },
   })

@@ -22,16 +22,16 @@ export function InfoTabs({ info, frame }: InfoTabsProps) {
 
   return (
     <Tabs defaultValue="component" className="min-h-0 gap-3">
-      <TabsList className="w-full overflow-x-auto">
+      <TabsList className="w-full justify-start overflow-x-auto group-data-[orientation=horizontal]/tabs:h-auto">
         {TABS.map((t) => (
-          <TabsTrigger key={t.value} value={t.value} className="min-h-11 text-xs">
+          <TabsTrigger key={t.value} value={t.value} className="min-h-11 shrink-0 text-xs">
             {t.label}
           </TabsTrigger>
         ))}
       </TabsList>
 
       <TabsContent value="component" className="space-y-2 text-sm">
-        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5">
+        <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1.5">
           {(
             [
               ['Sensor', c.name],
@@ -43,7 +43,7 @@ export function InfoTabs({ info, frame }: InfoTabsProps) {
           ).map(([k, v]) => (
             <div key={k} className="contents">
               <dt className="text-muted-foreground">{k}</dt>
-              <dd className="font-mono text-xs leading-5">{v}</dd>
+              <dd className="min-w-0 font-mono text-xs leading-5 break-words">{v}</dd>
             </div>
           ))}
         </dl>
@@ -63,14 +63,16 @@ export function InfoTabs({ info, frame }: InfoTabsProps) {
       </TabsContent>
 
       <TabsContent value="formula" className="space-y-3 text-sm">
-        <div className="rounded-md border border-copper/30 p-3">
+        <div className="min-w-0 overflow-x-auto rounded-md border border-copper/30 p-3">
           <Tex tex={info.formula.general} display />
         </div>
         <ul className="space-y-1 text-xs">
           {info.formula.variables.map((v) => (
             <li key={v.symbol} className="flex gap-2">
-              <Tex tex={v.symbol} />
-              <span className="text-muted-foreground">{v.meaning}</span>
+              <span className="shrink-0">
+                <Tex tex={v.symbol} />
+              </span>
+              <span className="min-w-0 break-words text-muted-foreground">{v.meaning}</span>
             </li>
           ))}
         </ul>
@@ -78,8 +80,10 @@ export function InfoTabs({ info, frame }: InfoTabsProps) {
         {steps && steps.length > 0 ? (
           <ol className="space-y-2">
             {steps.map((s) => (
-              <li key={s.tex} className="rounded-md bg-muted p-2">
-                <Tex tex={s.tex} display />
+              <li key={s.tex} className="min-w-0 rounded-md bg-muted p-2">
+                <div className="min-w-0 overflow-x-auto">
+                  <Tex tex={s.tex} display />
+                </div>
                 {s.note && <p className="text-xs text-muted-foreground">{s.note}</p>}
               </li>
             ))}
@@ -94,7 +98,7 @@ export function InfoTabs({ info, frame }: InfoTabsProps) {
           {info.signalPath.map((s, i) => (
             <li key={s.stage} className="flex gap-3">
               <span className="font-mono text-copper">{i + 1}</span>
-              <div>
+              <div className="min-w-0 break-words">
                 <p className="font-medium">{s.stage}</p>
                 <p className="text-muted-foreground">{s.detail}</p>
               </div>
@@ -105,7 +109,7 @@ export function InfoTabs({ info, frame }: InfoTabsProps) {
 
       <TabsContent value="circuit" className="space-y-3 text-sm">
         <p>{info.circuit.summary}</p>
-        <ul className="space-y-1.5 font-mono text-xs">
+        <ul className="space-y-1.5 font-mono text-xs break-words">
           {info.circuit.connections.map((cn) => (
             <li key={`${cn.from}-${cn.to}`}>
               {cn.from} → {cn.to}

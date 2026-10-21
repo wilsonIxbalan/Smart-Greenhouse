@@ -1,5 +1,7 @@
 /* Única fuente de color, tipografía y radios. Concepto "hoja + cobre": cobre solo para lo electrónico. */
-:root {
+/* .theme-light: fuerza el tema claro en un elemento (el PDF lee de ahí sus colores). */
+:root,
+.theme-light {
   --radius: 0.75rem;
   --font-sans: 'Geist Variable', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;

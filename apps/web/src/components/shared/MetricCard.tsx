@@ -49,7 +49,7 @@ export function MetricCard(props: MetricCardProps) {
     >
       <span aria-hidden className={cn('absolute inset-y-0 left-0 w-1', toneBar[tone])} />
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-sm font-medium text-muted-foreground">{label}</h3>
+        <h3 className="min-w-0 text-sm font-medium text-muted-foreground">{label}</h3>
         {props.badge && <StatusChip tone={props.badge.tone} label={props.badge.label} />}
       </div>
 
@@ -61,13 +61,13 @@ export function MetricCard(props: MetricCardProps) {
             : UNAVAILABLE_LABEL[availability]}
         </p>
       ) : (
-        <p className="flex items-baseline gap-1.5">
+        <p className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
           <span className={cn('font-mono text-3xl font-semibold', alert && 'text-critical')}>
             {value}
           </span>
           <span className="text-sm text-muted-foreground">{unit}</span>
           {alert && (
-            <span className="ml-1 inline-flex items-center gap-1 text-xs font-medium text-critical">
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-critical sm:ml-1">
               <TriangleAlert aria-hidden className="size-3.5" />
               Fuera de umbral
             </span>
@@ -81,7 +81,7 @@ export function MetricCard(props: MetricCardProps) {
       {!unavailable && props.details && (
         <dl className="grid grid-cols-2 gap-x-3 gap-y-1 font-mono text-xs">
           {props.details.map((d) => (
-            <div key={d.label} className="flex justify-between gap-2">
+            <div key={d.label} className="flex min-w-0 justify-between gap-2">
               <dt className="text-muted-foreground">{d.label}</dt>
               <dd>{d.value}</dd>
             </div>
@@ -90,7 +90,7 @@ export function MetricCard(props: MetricCardProps) {
       )}
       {props.note && <p className="text-xs text-muted-foreground italic">{props.note}</p>}
 
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         {stale && ageLabel ? (
           <span className="inline-flex items-center gap-1 text-xs text-warning">
             <Clock aria-hidden className="size-3.5" />

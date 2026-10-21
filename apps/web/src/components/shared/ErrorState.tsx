@@ -17,7 +17,7 @@ export function ErrorState({ title = 'Algo salió mal', description, onRetry }: 
       <p className="font-medium">{title}</p>
       {description && <p className="text-sm text-muted-foreground">{description}</p>}
       {onRetry && (
-        <Button variant="outline" size="sm" onClick={onRetry}>
+        <Button variant="outline" className="min-h-11" onClick={onRetry}>
           Reintentar
         </Button>
       )}

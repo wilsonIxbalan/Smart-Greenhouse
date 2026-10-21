@@ -1,4 +1,5 @@
 import {
+  ackCommand,
   DEFAULT_TTL_S,
   generateTelemetry,
   parseCommand,
@@ -15,8 +16,7 @@ interface ManualOverride {
 }
 
 /**
- * Emula al Mega: trama del generador + overrides manuales con TTL, interlocks (BR-I01, BR-I02)
- * e idempotencia por id (BR-C05). `now` en segundos desde el arranque.
+ * Emula al Mega: trama del generador + overrides manuales con TTL.
  */
 export class SimulatedDevice {
   private manual = new Map<Actuator, ManualOverride>()
@@ -65,7 +65,7 @@ export class SimulatedDevice {
     if (cmd.kind === 'auto') {
       if (cmd.act) this.manual.delete(cmd.act)
       else this.manual.clear()
-      return { ack: cmd.id, ok: 1 }
+      return { ack: cmd.id, ok: 1, cmd: ackCommand(cmd) }
     }
     if (cmd.kind === 'switch' && cmd.act === 'bomba' && cmd.on && current.agua === 0) {
       return { ack: cmd.id, ok: 0, err: 'NO_WATER' }
@@ -75,6 +75,6 @@ export class SimulatedDevice {
     }
     const value = cmd.kind === 'switch' ? (cmd.on ? 1 : 0) : cmd.val
     this.manual.set(cmd.act, { value, expiresAt: now + (cmd.ttl ?? DEFAULT_TTL_S) })
-    return { ack: cmd.id, ok: 1 }
+    return { ack: cmd.id, ok: 1, cmd: ackCommand(cmd) }
   }
 }

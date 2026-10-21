@@ -1,6 +1,7 @@
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
 import { useMemo } from 'react'
+import { cn } from '@/lib/utils'
 
 interface TexProps {
   tex: string
@@ -15,7 +16,10 @@ export function Tex({ tex, display = false }: TexProps) {
   )
   return (
     <span
-      className="max-w-full overflow-x-auto text-copper"
+      className={cn(
+        'text-copper',
+        display && 'block max-w-full min-w-0 overflow-x-auto overflow-y-hidden',
+      )}
       // KaTeX genera el HTML a partir de contenido propio del repo (sin entrada de usuario).
       dangerouslySetInnerHTML={{ __html: html }}
     />

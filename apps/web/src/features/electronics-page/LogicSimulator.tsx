@@ -58,12 +58,17 @@ function Signal({ label, on, testId }: { label: string; on: boolean; testId?: st
       data-testid={testId}
       data-on={on}
       className={cn(
-        'flex min-h-11 items-center justify-between gap-2 rounded-md border px-3 text-sm',
+        'flex min-h-11 min-w-0 items-center justify-between gap-2 rounded-md border px-2.5 py-1 text-xs sm:px-3 sm:text-sm',
         on ? 'border-copper bg-copper/15' : 'border-border bg-muted/40',
       )}
     >
-      <span className="font-mono">{label}</span>
-      <span className={cn('font-mono font-semibold', on ? 'text-copper' : 'text-muted-foreground')}>
+      <span className="min-w-0 font-mono break-words">{label}</span>
+      <span
+        className={cn(
+          'shrink-0 font-mono font-semibold',
+          on ? 'text-copper' : 'text-muted-foreground',
+        )}
+      >
         {on ? '1' : '0'}
       </span>
     </div>
@@ -80,8 +85,8 @@ function Gate({
   output: { label: string; on: boolean; testId: string }
 }) {
   return (
-    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-      <div className="space-y-1">
+    <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+      <div className="min-w-0 space-y-1">
         {inputs.map((i) => (
           <Signal key={i.label} label={i.label} on={i.on} />
         ))}
@@ -119,7 +124,7 @@ export function LogicSimulator({ frame }: { frame: Telemetry | null }) {
         action={
           <Button
             variant="outline"
-            className="min-h-11"
+            className="min-h-11 shrink-0"
             disabled={!frame}
             onClick={() => frame && setS(fromFrame(frame))}
           >
@@ -128,15 +133,15 @@ export function LogicSimulator({ frame }: { frame: Telemetry | null }) {
         }
       />
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_1.4fr]">
-        <div className="space-y-3 rounded-xl border bg-card p-4">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+        <div className="min-w-0 space-y-3 rounded-xl border bg-card p-4">
           {SLIDERS.map((sl) => {
             const id = `${baseId}-${sl.key}`
             return (
               <div key={sl.key} className="space-y-1">
-                <label htmlFor={id} className="flex justify-between text-sm">
+                <label htmlFor={id} className="flex justify-between gap-3 text-sm">
                   <span>{sl.label}</span>
-                  <span className="font-mono text-copper">
+                  <span className="shrink-0 font-mono text-copper">
                     {s[sl.key]} {sl.unit}
                   </span>
                 </label>
@@ -153,7 +158,7 @@ export function LogicSimulator({ frame }: { frame: Telemetry | null }) {
               </div>
             )
           })}
-          <div className="flex min-h-11 items-center justify-between">
+          <div className="flex min-h-11 items-center justify-between gap-3">
             <label htmlFor={`${baseId}-water`} className="text-sm">
               Hay agua en el depósito (flotador)
             </label>
@@ -161,7 +166,7 @@ export function LogicSimulator({ frame }: { frame: Telemetry | null }) {
           </div>
         </div>
 
-        <div className="space-y-4 rounded-xl border bg-card p-4">
+        <div className="min-w-0 space-y-4 rounded-xl border bg-card p-4">
           <Gate
             name="OR"
             inputs={[

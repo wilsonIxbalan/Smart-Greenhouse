@@ -20,19 +20,19 @@ export function ComponentCatalog({ onInfo }: { onInfo: (key: InfoKey) => void })
         {items.map((c) => {
           const infoKey = c.infoKey
           return (
-            <li key={c.key} className="flex flex-col gap-2 rounded-xl border bg-card p-4">
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="text-sm font-semibold">{c.name}</h3>
-                <span className="shrink-0 rounded-md bg-copper/10 px-2 py-0.5 font-mono text-xs text-copper">
+            <li key={c.key} className="flex min-w-0 flex-col gap-2 rounded-xl border bg-card p-4">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <h3 className="min-w-0 text-sm font-semibold break-words">{c.name}</h3>
+                <span className="max-w-full shrink-0 rounded-md bg-copper/10 px-2 py-0.5 font-mono text-xs text-copper">
                   {c.pin}
                 </span>
               </div>
               <p className="text-sm">{c.role}</p>
-              <dl className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-xs">
+              <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-2 gap-y-1 text-xs">
                 <dt className="text-muted-foreground">Interfaz</dt>
-                <dd>{c.iface}</dd>
+                <dd className="min-w-0 break-words">{c.iface}</dd>
                 <dt className="text-muted-foreground">Principio</dt>
-                <dd>{c.principle}</dd>
+                <dd className="min-w-0 break-words">{c.principle}</dd>
               </dl>
               <div className="mt-auto flex flex-wrap items-center gap-2">
                 {c.status === 'pendiente' && <StatusChip tone="warning" label="Pendiente" />}

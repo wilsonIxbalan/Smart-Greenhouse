@@ -41,3 +41,21 @@ export function formatAge(ms: number): string {
   if (h < 24) return `hace ${h} h`
   return `hace ${Math.floor(h / 24)} d`
 }
+
+/** Duración legible: "12 min", "2 h 5 min". */
+export function formatDuration(ms: number): string {
+  const min = Math.round(ms / 60_000)
+  if (min < 1) return 'menos de 1 min'
+  if (min < 60) return `${min} min`
+  const h = Math.floor(min / 60)
+  return min % 60 ? `${h} h ${min % 60} min` : `${h} h`
+}
+
+/** El más reciente de dos instantes (trama en caché vs `last_seen_at`); null si no hay ninguno. */
+export function latestTimestamp(
+  a: number | null | undefined,
+  b: number | null | undefined,
+): number | null {
+  if (a == null) return b ?? null
+  return b == null ? a : Math.max(a, b)
+}

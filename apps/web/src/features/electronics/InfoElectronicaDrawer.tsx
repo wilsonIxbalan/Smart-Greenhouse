@@ -1,4 +1,5 @@
 import type { Telemetry } from '@inv/contracts'
+import { lazy, Suspense } from 'react'
 import {
   Drawer,
   DrawerContent,
@@ -13,10 +14,16 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { Skeleton } from '@/components/ui/skeleton'
 import { electronicsInfo } from '@/content/electronics'
 import type { InfoKey } from '@/content/electronics/types'
-import { InfoTabs } from '@/features/electronics/InfoTabs'
 import { useMediaQuery } from '@/lib/use-media-query'
+
+// KaTeX (fórmulas) solo se descarga la primera vez que se abre el panel.
+const InfoTabs = lazy(() =>
+  import('@/features/electronics/InfoTabs').then((m) => ({ default: m.InfoTabs })),
+)
+const tabsFallback = <Skeleton className="h-64 rounded-xl" />
 
 const DESKTOP_QUERY = '(min-width: 1024px)'
 
@@ -44,7 +51,13 @@ export function InfoElectronicaDrawer({ infoKey, frame, onClose }: InfoElectroni
             <SheetTitle className="text-copper">{info?.title ?? 'Info Electrónica'}</SheetTitle>
             <SheetDescription>{description}</SheetDescription>
           </SheetHeader>
-          <div className="px-4 pb-6">{info && <InfoTabs info={info} frame={frame} />}</div>
+          <div className="px-4 pb-6">
+            {info && (
+              <Suspense fallback={tabsFallback}>
+                <InfoTabs info={info} frame={frame} />
+              </Suspense>
+            )}
+          </div>
         </SheetContent>
       </Sheet>
     )
@@ -52,13 +65,17 @@ export function InfoElectronicaDrawer({ infoKey, frame, onClose }: InfoElectroni
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90dvh]">
+      <DrawerContent className="data-[vaul-drawer-direction=bottom]:max-h-[90dvh]">
         <DrawerHeader>
           <DrawerTitle className="text-copper">{info?.title ?? 'Info Electrónica'}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        <div className="overflow-y-auto px-4 pb-6">
-          {info && <InfoTabs info={info} frame={frame} />}
+        <div className="min-w-0 overflow-y-auto px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+          {info && (
+            <Suspense fallback={tabsFallback}>
+              <InfoTabs info={info} frame={frame} />
+            </Suspense>
+          )}
         </div>
       </DrawerContent>
     </Drawer>

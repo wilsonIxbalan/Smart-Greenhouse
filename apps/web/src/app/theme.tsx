@@ -31,7 +31,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(readStoredTheme)
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark')
+    const root = document.documentElement
+    root.classList.toggle('dark', theme === 'dark')
+    // Barra de estado del celular con el mismo fondo del tema (color leído de tokens.css).
+    const background = getComputedStyle(root).getPropertyValue('--background').trim()
+    if (background)
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', background)
     try {
       localStorage.setItem(STORAGE_KEY, theme)
     } catch {

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { TIMING } from '@/config/thresholds'
+import { serverNow } from '@/lib/server-clock'
 
-/** Reloj que se actualiza cada segundo para recalcular "hace X" y datos viejos. */
+/** Hora del servidor que se actualiza cada segundo (dato viejo, "hace X", cuenta regresiva). */
 export function useNow(intervalMs: number = TIMING.clockTickMs): number {
-  const [now, setNow] = useState(() => Date.now())
+  const [now, setNow] = useState(serverNow)
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), intervalMs)
+    const id = setInterval(() => setNow(serverNow()), intervalMs)
     return () => clearInterval(id)
   }, [intervalMs])
   return now
