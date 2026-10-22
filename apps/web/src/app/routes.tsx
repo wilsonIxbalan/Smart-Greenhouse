@@ -54,6 +54,13 @@ export const routes: RouteObject[] = [
               (m) => m.ElectronicsPage,
             ),
           },
+          {
+            path: 'bitacora',
+            lazy: page(
+              () => import('@/features/audit/AuditPage'),
+              (m) => m.AuditPage,
+            ),
+          },
           { path: '*', element: <Navigate to="/" replace /> },
         ],
       },
