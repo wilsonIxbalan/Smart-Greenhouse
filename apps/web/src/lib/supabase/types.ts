@@ -67,6 +67,23 @@ export interface CommandRow extends CommandRequest {
   resolvedAt: number | null
 }
 
+/** Fila de `audit_log` (solo admin). `actor` null = cambio hecho desde el dashboard o el SQL Editor. */
+export interface AuditEntry {
+  id: number
+  actor: string | null
+  action: string
+  entity: string
+  entityId: string | null
+  details: Record<string, unknown> | null
+  createdAt: number
+}
+
+/** Autor de una entrada de la bitácora. */
+export interface AuditPerson {
+  name: string
+  role: Role
+}
+
 export const ALERT_TYPES = [
   'co_high',
   'air_high',

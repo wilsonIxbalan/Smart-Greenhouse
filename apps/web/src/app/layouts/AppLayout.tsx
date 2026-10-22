@@ -1,11 +1,11 @@
-import { Bell, LogOut, Moon, Sun } from 'lucide-react'
+import { Bell, LogOut, Moon, ScrollText, Sun } from 'lucide-react'
 import { Link, Outlet, useNavigation } from 'react-router'
 import { BottomNav } from '@/app/layouts/BottomNav'
 import { SideNav } from '@/app/layouts/SideNav'
 import { useTheme } from '@/app/theme'
 import { Button } from '@/components/ui/button'
 import { ROLE_LABEL } from '@/config/permissions'
-import { useProfile, useSignOut } from '@/features/auth/hooks'
+import { usePermissions, useProfile, useSignOut } from '@/features/auth/hooks'
 import { useLiveAlerts } from '@/features/alerts/hooks'
 import { OpenAlertsBadge } from '@/features/alerts/OpenAlertsBadge'
 import { useLiveCommands } from '@/features/control/hooks'
@@ -14,6 +14,7 @@ import { useLiveReadings } from '@/features/dashboard/hooks'
 export function AppLayout() {
   const { theme, toggleTheme } = useTheme()
   const { data: profile } = useProfile()
+  const { can } = usePermissions()
   const signOut = useSignOut()
   const loadingPage = useNavigation().state === 'loading'
   useLiveReadings()
@@ -30,14 +31,26 @@ export function AppLayout() {
         />
       )}
       <header className="sticky top-0 z-20 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between gap-2 border-b bg-background/90 pt-[env(safe-area-inset-top)] pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))] backdrop-blur">
-        <Link to="/" className="font-semibold">
-          Invernadero
+        <Link to="/" className="flex min-w-0 flex-col leading-tight">
+          <span className="font-semibold">Invernadero</span>
+          {profile && (
+            <span className="truncate text-xs text-muted-foreground lg:hidden">
+              {ROLE_LABEL[profile.role]}
+            </span>
+          )}
         </Link>
         <div className="flex min-w-0 items-center gap-1">
           {profile && (
             <span className="hidden truncate pr-2 text-sm text-muted-foreground lg:inline">
               {profile.fullName ?? profile.email} · {ROLE_LABEL[profile.role]}
             </span>
+          )}
+          {can('audit.view') && (
+            <Button variant="ghost" size="icon" asChild className="size-11 lg:hidden">
+              <Link to="/bitacora" aria-label="Bitácora">
+                <ScrollText />
+              </Link>
+            </Button>
           )}
           <Button variant="ghost" size="icon" asChild className="relative size-11 lg:hidden">
             <Link to="/alertas" aria-label="Alertas">

@@ -1,4 +1,4 @@
-import { Activity, BarChart3, Bell, Cpu, Gauge, type LucideIcon } from 'lucide-react'
+import { Activity, BarChart3, Bell, Cpu, Gauge, ScrollText, type LucideIcon } from 'lucide-react'
 import type { Permission } from '@/config/permissions'
 
 export interface NavItem {
@@ -22,4 +22,5 @@ export const bottomNav: readonly NavItem[] = [
 /** Destinos secundarios: solo en el menú lateral de escritorio. */
 export const secondaryNav: readonly NavItem[] = [
   { to: '/alertas', label: 'Alertas', icon: Bell, badge: 'openAlerts' },
+  { to: '/bitacora', label: 'Bitácora', icon: ScrollText, permission: 'audit.view' },
 ]
