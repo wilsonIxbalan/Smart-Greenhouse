@@ -55,6 +55,13 @@ export const routes: RouteObject[] = [
             ),
           },
           {
+            path: 'accesos',
+            lazy: page(
+              () => import('@/features/access/AccessPage'),
+              (m) => m.AccessPage,
+            ),
+          },
+          {
             path: 'bitacora',
             lazy: page(
               () => import('@/features/audit/AuditPage'),

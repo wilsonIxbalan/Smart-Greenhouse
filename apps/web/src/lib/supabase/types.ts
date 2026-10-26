@@ -116,3 +116,31 @@ export interface Profile {
   role: Role
   active: boolean
 }
+
+/** Fila de `rfid_cards`: tarjeta que el Mega deja pasar (si está activa). */
+export interface AccessCard {
+  id: number
+  uid: string
+  holder: string
+  active: boolean
+  createdAt: number
+  updatedAt: number
+}
+
+/** Fila de `rfid_events`: un intento en el lector. `granted` es lo que decidió el Mega. */
+export interface AccessEvent {
+  id: number
+  uid: string
+  granted: boolean
+  cardId: number | null
+  /** Nombre al momento del intento; null = tarjeta no registrada. */
+  holder: string | null
+  receivedAt: number
+}
+
+/** Fila de `rfid_sync`: versión de la lista en la nube y la que confirmó el Mega. */
+export interface AccessSync {
+  cardsVersion: number
+  megaVersion: number | null
+  checkedAt: number | null
+}

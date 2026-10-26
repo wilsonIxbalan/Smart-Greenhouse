@@ -13,6 +13,8 @@ export const PERMISSIONS = {
   'alerts.ack': ['admin', 'operador'],
   'report.send': ['admin', 'operador'],
   'audit.view': ['admin'],
+  'access.view': ['admin', 'operador'],
+  'access.manage': ['admin'],
 } as const satisfies Record<string, readonly Role[]>
 
 export type Permission = keyof typeof PERMISSIONS

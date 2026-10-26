@@ -3,6 +3,9 @@
    Mega (Serial2) <-> Supabase (HTTPS, RPC device_*). Solo comunica:
    el Mega decide; el ESP32 reenvia tramas, comandos y ACK.
    Placa: ESP32 Dev Module (core 3.x). Libreria: ArduinoJson 7.
+   RFID (1.2): reenvia los intentos del lector ({"rfid":...,"ok":...}) a
+   device_rfid_event y mantiene la lista de tarjetas del Mega al dia con
+   device_pull_cards (lineas @CARDS / @CARD / @END). Cambios marcados "RFID".
    ============================================================ */
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -26,7 +29,9 @@ const unsigned long NTP_RETRY_MS   = 60000;
 const unsigned long BACKOFF_MIN_MS = 5000, BACKOFF_MAX_MS = 30000;
 const size_t MAX_FRAME_BYTES = 512;          // MAX_FRAME_BYTES del contrato
 const size_t MAX_LINE = 700;
-const char *FW_VERSION = "esp32-gw-1.1";
+const char *FW_VERSION = "esp32-gw-1.2-rfid";
+const unsigned long CARDS_MS       = 30000;  // RFID: cada cuanto se revisa la lista de tarjetas
+const unsigned long CARDS_ASK_MS   = 600000; // RFID: cada 10 min se vuelve a preguntar al Mega su version
 
 // ---------- ESTADO ----------
 String line;                  // linea en curso desde el Mega
@@ -46,6 +51,16 @@ long ackIds[QUEUE];
 int ackCount = 0;
 String cmdQueue[QUEUE];       // comandos traidos de la nube, se escriben al Mega de a uno
 int cmdCount = 0;
+
+// ---------- RFID ----------
+String rfidQueue[QUEUE];      // intentos del lector que la nube aun no recibio
+int rfidCount = 0;
+const int SYNC_MAX = 24;      // @CARDS + 20 tarjetas + @END (con margen)
+String syncLines[SYNC_MAX];   // lista de tarjetas que se esta escribiendo al Mega
+int syncCount = 0, syncIdx = 0;
+long megaCardsVer = -1;       // version de la lista que tiene el Mega (-1 = aun no se sabe)
+bool megaCardsAsked = false;
+unsigned long lastCards = 0, lastCardsAsk = 0;
 
 WiFiClientSecure tls;
 HTTPClient http;
@@ -100,6 +115,11 @@ void loop() {
     if (!enviarTrama()) return;
   }
   if (megaVivo && cmdCount == 0 && millis() - lastPoll >= POLL_MS) { lastPoll = millis(); traerComandos(); }
+  // RFID: intentos del lector y lista de tarjetas
+  if (!enviarEventosRfid()) return;
+  if (megaVivo && syncIdx >= syncCount && (lastCards == 0 || millis() - lastCards >= CARDS_MS)) {
+    sincronizarTarjetas();
+  }
 }
 
 // TLS necesita la hora real para validar fechas del certificado. Nunca bloquea el bucle.
@@ -171,6 +191,23 @@ void procesarLinea(String l) {
     if (doc["ok"] == 1) { frameSent = true; sendNextFrame = true; }  // espera la trama con el estado nuevo
     return;
   }
+  if (doc["rfid"].is<const char *>()) {       // RFID: intento en el lector {"rfid":"53D8...","ok":1}
+    String ev;
+    serializeJson(doc, ev);
+    encolarRfid(ev);
+    Serial.println("[rfid] " + ev);
+    return;
+  }
+  if (doc["cards"].is<long>()) {              // RFID: el Mega confirma su lista {"cards":7,"ok":1,"n":4}
+    if (doc["ok"] == 1) {
+      megaCardsVer = doc["cards"].as<long>();
+      Serial.println("[rfid] el Mega tiene la lista v" + String(megaCardsVer) + " (" + String(doc["n"].as<int>()) + " tarjetas)");
+    } else {
+      Serial.println("[rfid] el Mega rechazo la lista v" + String(doc["cards"].as<long>()) + "; se reintenta");
+      lastCards = millis() - CARDS_MS + 5000;  // reintento en 5 s
+    }
+    return;
+  }
   if (doc["v"] == 1) {                        // trama de telemetria v1
     String frame;
     serializeJson(doc, frame);
@@ -189,7 +226,16 @@ void procesarLinea(String l) {
 
 // ---------- ESP32 -> MEGA ----------
 void escribirComando() {
-  if (cmdCount == 0 || millis() - lastCmdAt < CMD_GAP_MS) return;
+  if (millis() - lastCmdAt < CMD_GAP_MS) return;
+  if (cmdCount == 0) {                        // RFID: sin comandos pendientes, sigue la lista de tarjetas
+    if (syncIdx < syncCount) {
+      Serial2.print(syncLines[syncIdx]);
+      Serial2.print('\n');
+      lastCmdAt = millis();
+      if (++syncIdx == syncCount && syncCount > 1) Serial.println("[rfid] lista enviada al Mega; esperando su confirmacion");
+    }
+    return;
+  }
   Serial2.print(cmdQueue[0]);
   Serial2.print('\n');
   Serial.println("[cmd] -> Mega: " + cmdQueue[0]);
@@ -314,4 +360,85 @@ bool enviarAcks() {
     ackCount--;
   }
   return true;
+}
+
+// ---------- RFID ----------
+void encolarRfid(const String &ev) {
+  if (rfidCount == QUEUE) {                   // cola llena (mucho tiempo sin red): se pierde el mas viejo
+    for (int i = 1; i < QUEUE; i++) rfidQueue[i - 1] = rfidQueue[i];
+    rfidCount--;
+  }
+  rfidQueue[rfidCount++] = ev;
+}
+
+// Devuelve false si quedo alguno pendiente por fallo de red.
+bool enviarEventosRfid() {
+  while (rfidCount > 0) {
+    JsonDocument body;
+    body["p_event"] = serialized(rfidQueue[0]);
+    String resp;
+    int status = rpc("device_rfid_event", body, resp);
+    if (reintentable(status)) { Serial.println("[rfid] intento pendiente (" + String(status) + ")"); return false; }
+    Serial.println((status == 200 ? String("[rfid] registrado ") : "[rfid] rechazado " + String(status) + ": ") + resp.substring(0, 160));
+    for (int i = 1; i < rfidCount; i++) rfidQueue[i - 1] = rfidQueue[i];
+    rfidCount--;
+  }
+  return true;
+}
+
+bool soloHex(const char *s) {
+  size_t n = strlen(s);
+  if (n != 8 && n != 14 && n != 20) return false;
+  for (size_t i = 0; i < n; i++) if (!isxdigit((unsigned char)s[i])) return false;
+  return true;
+}
+
+// Compara la version de la nube con la del Mega y, si cambio, le escribe la lista.
+void sincronizarTarjetas() {
+  lastCards = millis();
+
+  // 1) Saber que version tiene el Mega (al arrancar y cada 10 min)
+  if (millis() - lastCardsAsk >= CARDS_ASK_MS) { megaCardsVer = -1; megaCardsAsked = false; }
+  if (megaCardsVer < 0 && !megaCardsAsked) {
+    syncLines[0] = "@CARDS?"; syncCount = 1; syncIdx = 0;
+    megaCardsAsked = true; lastCardsAsk = millis();
+    lastCards = millis() - CARDS_MS + 2000;   // la respuesta llega en menos de 2 s
+    return;
+  }
+
+  // 2) Lista vigente en la nube
+  JsonDocument body;
+  if (megaCardsVer >= 0) body["p_mega_version"] = megaCardsVer;
+  String resp;
+  int status = rpc("device_pull_cards", body, resp);
+  if (status != 200) {
+    if (!reintentable(status)) Serial.println("[rfid] lista: error " + String(status) + ": " + resp.substring(0, 200));
+    return;
+  }
+  JsonDocument d;
+  if (deserializeJson(d, resp) || !d["ver"].is<long>() || !d["cards"].is<JsonArray>()) {
+    Serial.println("[rfid] lista con formato inesperado: " + resp.substring(0, 120));
+    return;
+  }
+  long ver = d["ver"].as<long>();
+  if (ver == megaCardsVer) return;            // el Mega ya esta al dia
+
+  // 3) Armar las lineas: @CARDS <ver> <n> / @CARD <uid> <nombre> / @END <ver>
+  String cards[SYNC_MAX];
+  int n = 0;
+  for (JsonObject c : d["cards"].as<JsonArray>()) {
+    const char *uid = c["uid"] | "";
+    const char *name = c["name"] | "";
+    if (!soloHex(uid) || n >= 20) continue;
+    String l = String("@CARD ") + uid;
+    String nombre;
+    for (const char *p = name; *p && nombre.length() < 10; p++) if (isalnum((unsigned char)*p)) nombre += *p;
+    if (nombre.length()) l += " " + nombre;
+    cards[n++] = l;
+  }
+  syncCount = 0; syncIdx = 0;
+  syncLines[syncCount++] = "@CARDS " + String(ver) + " " + String(n);
+  for (int i = 0; i < n; i++) syncLines[syncCount++] = cards[i];
+  syncLines[syncCount++] = "@END " + String(ver);
+  Serial.println("[rfid] lista v" + String(ver) + " (" + String(n) + " tarjetas) -> Mega (tenia v" + String(megaCardsVer) + ")");
 }
