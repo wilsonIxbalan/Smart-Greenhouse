@@ -10,8 +10,8 @@ export interface GeneratorOptions {
   lightSensor?: boolean
 }
 
-// Umbrales del firmware de referencia (Firmware_Invernadero_Mega.ino)
-const U = { riegoOn: 30, riegoOff: 60, temp: 30, hum: 80, luz: 200, mq135: 270, mq7: 160 } as const
+// Umbrales calibrados por el equipo en el Mega (25 oct)
+const U = { riegoOn: 30, riegoOff: 60, temp: 30, hum: 80, luz: 100, mq135: 180, mq7: 270 } as const
 const DAY_S = 86_400
 const DRY_CYCLE_S = 7_200
 const PUMP_S = 240
@@ -63,8 +63,8 @@ export function generateTelemetry(seed: number, t: number, opts: GeneratorOption
 
   const sueloOk = scenario !== 'falla_suelo'
   const ph = round(6.4 + n(4) * 0.05, 1)
-  const aire = Math.round(clamp(180 + 20 * n(5) + (scenario === 'co_alto' ? 140 : 0), 0, 1023))
-  const co = Math.round(clamp(90 + 10 * n(6) + (scenario === 'co_alto' ? 120 : 0), 0, 1023))
+  const aire = Math.round(clamp(120 + 20 * n(5) + (scenario === 'co_alto' ? 140 : 0), 0, 1023))
+  const co = Math.round(clamp(90 + 10 * n(6) + (scenario === 'co_alto' ? 200 : 0), 0, 1023))
 
   const ventilar = aireT > U.temp || aireH > U.hum
   const gasMalo = aire > U.mq135 || co > U.mq7

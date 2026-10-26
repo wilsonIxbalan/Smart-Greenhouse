@@ -21,7 +21,7 @@ export function shouldVentilate(tempC: number, humidity: number): boolean {
   return tempC > THRESHOLDS.airTempMaxC || humidity > THRESHOLDS.airHumidityMax
 }
 
-/** gasMalo = MQ135 > 270 ∨ MQ7 > 160 (cuentas ADC) */
+/** gasMalo = MQ135 > 180 ∨ MQ7 > 270 (cuentas ADC) */
 export function isGasBad(mq135Adc: number, mq7Adc: number): boolean {
   return mq135Adc > THRESHOLDS.mq135MaxAdc || mq7Adc > THRESHOLDS.mq7MaxAdc
 }

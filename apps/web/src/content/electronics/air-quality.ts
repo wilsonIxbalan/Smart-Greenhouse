@@ -1,8 +1,9 @@
+import { THRESHOLDS } from '@/config/thresholds'
 import type { FormulaStep, ElectronicsInfo } from './types'
 import { adcToVolts, fx } from './format'
 
-export const MQ135_THRESHOLD = 270
-export const MQ7_THRESHOLD = 160
+export const MQ135_THRESHOLD = THRESHOLDS.mq135MaxAdc
+export const MQ7_THRESHOLD = THRESHOLDS.mq7MaxAdc
 
 function sensorSteps(label: string, adc: number, threshold: number): FormulaStep[] {
   const v = adcToVolts(adc)
@@ -58,7 +59,10 @@ export const airQuality: ElectronicsInfo = {
     { stage: 'Capa SnO₂ caliente', detail: 'R_s cambia con la concentración de gas.' },
     { stage: 'Divisor R_s / R_L', detail: 'Convierte la resistencia en voltaje 0–5 V.' },
     { stage: 'ADC del Mega (A2, A3)', detail: '10 bits: 5 V / 1023 ≈ 4.89 mV por cuenta.' },
-    { stage: 'Lógica (interlock)', detail: 'MQ-135 > 270 o MQ-7 > 160 → ventilador y alarma.' },
+    {
+      stage: 'Lógica (interlock)',
+      detail: `MQ-135 > ${MQ135_THRESHOLD} o MQ-7 > ${MQ7_THRESHOLD} → ventilador y alarma (apaga 20 cuentas abajo, mínimo 10 s encendida; ignora el primer minuto de precalentamiento).`,
+    },
     { stage: 'Trama', detail: 'Campos aire_mq135 y co en cuentas crudas.' },
   ],
   circuit: {
