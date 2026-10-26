@@ -1,4 +1,4 @@
-import { Bell, LogOut, Moon, ScrollText, Sun } from 'lucide-react'
+import { Bell, KeyRound, LogOut, Moon, ScrollText, Sun } from 'lucide-react'
 import { Link, Outlet, useNavigation } from 'react-router'
 import { BottomNav } from '@/app/layouts/BottomNav'
 import { SideNav } from '@/app/layouts/SideNav'
@@ -44,6 +44,13 @@ export function AppLayout() {
             <span className="hidden truncate pr-2 text-sm text-muted-foreground lg:inline">
               {profile.fullName ?? profile.email} · {ROLE_LABEL[profile.role]}
             </span>
+          )}
+          {can('access.view') && (
+            <Button variant="ghost" size="icon" asChild className="size-11 lg:hidden">
+              <Link to="/accesos" aria-label="Accesos">
+                <KeyRound />
+              </Link>
+            </Button>
           )}
           {can('audit.view') && (
             <Button variant="ghost" size="icon" asChild className="size-11 lg:hidden">
