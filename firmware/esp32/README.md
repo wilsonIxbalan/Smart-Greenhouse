@@ -4,8 +4,8 @@ Puente entre el Arduino Mega y Supabase. **No decide nada**: reenvía la telemet
 Mega y devuelve sus ACK (contrato v1, `packages/contracts`). Es el mismo canal que usa el simulador.
 
 ```
-Mega TX1 (D18) ──divisor 1k/2k──► GPIO16 (RX2)      GND común
-Mega RX1 (D19) ◄────────────────── GPIO17 (TX2)      9600 baud
+Mega TX1 (D18) ──TXS0108E──► GPIO16 (RX2)      GND común
+Mega RX1 (D19) ◄─TXS0108E─── GPIO17 (TX2)      9600 baud
 ```
 
 | Qué hace | Cuándo |

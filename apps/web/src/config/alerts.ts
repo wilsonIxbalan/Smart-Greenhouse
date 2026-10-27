@@ -38,7 +38,7 @@ export const DASHBOARD_ALERTS = [
   {
     key: 'dht-no-reading',
     tone: 'warning',
-    title: 'DHT22 sin lectura',
+    title: 'DHT11 sin lectura',
     description: 'No hay temperatura ni humedad del aire válidas.',
     when: (f) => f.dht_ok === 0,
   },

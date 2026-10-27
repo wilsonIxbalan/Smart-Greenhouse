@@ -15,7 +15,7 @@
 #include "secrets.h"   // copiar de secrets.h.example
 #include "ca_roots.h"
 
-// ---------- PINES (ARCHITECTURE: GND comun; TX1 del Mega llega por divisor 1k/2k) ----------
+// ---------- PINES (ARCHITECTURE: GND comun; Serial1 del Mega por TXS0108E 5 V <-> 3,3 V) ----------
 #define PIN_RX_MEGA 16   // RX2 <- TX1 (D18) del Mega
 #define PIN_TX_MEGA 17   // TX2 -> RX1 (D19) del Mega
 #define MEGA_BAUD   9600
