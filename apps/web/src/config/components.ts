@@ -16,12 +16,12 @@ export interface HardwareComponent {
 /** Catálogo según el mapa de pines del firmware de referencia del Mega. */
 export const HARDWARE_COMPONENTS = [
   {
-    key: 'dht22',
-    name: 'DHT22',
+    key: 'dht11',
+    name: 'DHT11',
     role: 'Temperatura y humedad del aire',
     iface: 'Digital 1 hilo',
     pin: 'D2',
-    principle: 'Termistor + sensor capacitivo de humedad; trama serie temporizada.',
+    principle: 'Termistor + sensor resistivo de humedad; trama serie temporizada.',
     infoKey: 'air-climate',
   },
   {
@@ -176,7 +176,7 @@ export const HARDWARE_COMPONENTS = [
     iface: 'Serial1 9600 ↔ HTTPS',
     pin: 'TX1 D18 · RX1 D19',
     principle:
-      'Recibe JSON por UART y lo publica por HTTPS. TX1 (5 V) pasa por divisor 1k/2k a 3,3 V.',
+      'Recibe JSON por UART y lo publica por HTTPS. El TXS0108E adapta niveles: 5 V del Mega ↔ 3,3 V del ESP32.',
   },
 ] as const satisfies readonly HardwareComponent[]
 
@@ -205,7 +205,7 @@ export const SIGNAL_STAGES = [
   {
     key: 'uart',
     title: 'UART 9600',
-    detail: 'Serial1 (D18/D19) Mega ↔ ESP32; divisor 1k/2k en TX1',
+    detail: 'Serial1 (D18/D19) Mega ↔ ESP32 vía TXS0108E (5 V ↔ 3,3 V)',
     electronic: true,
   },
   { key: 'esp32', title: 'ESP32', detail: 'Gateway WiFi', electronic: true },

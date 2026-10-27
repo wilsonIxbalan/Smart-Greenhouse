@@ -49,7 +49,11 @@ export const light: ElectronicsInfo = {
   signalPath: [
     { stage: 'Fotodiodo BH1750', detail: 'Corriente proporcional a la iluminancia.' },
     { stage: 'ADC interno + I2C', detail: 'El Mega lee 2 bytes en la dirección 0x23.' },
-    { stage: 'Lógica', detail: 'Si 0 ≤ lux < 200: duty = 200 (≈78 %); si no, 0.' },
+    {
+      stage: 'Lógica',
+      detail:
+        'Si 0 ≤ lux < 100 enciende la tira (brillo mínimo útil: duty 40); apaga sobre 120 lx (histéresis de 20 lx).',
+    },
     { stage: 'D4 PWM → MOSFET', detail: 'Conmuta el negativo de la tira de 12 V.' },
     { stage: 'Trama', detail: 'Campos lux y luz = map(duty, 0, 255, 0, 100).' },
   ],

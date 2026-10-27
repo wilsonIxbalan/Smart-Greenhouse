@@ -1,12 +1,12 @@
-/** Umbrales del firmware de referencia (se moverán a la base de datos en B5). */
+/** Umbrales del Mega (calibrados por el equipo, 25 oct). Igualar a mano con la tabla `thresholds`. */
 export const THRESHOLDS = {
   airTempMaxC: 30,
   airHumidityMax: 80,
   soilIrrigateOn: 30,
   soilIrrigateOff: 60,
-  lightMinLux: 200,
-  mq135MaxAdc: 270,
-  mq7MaxAdc: 160,
+  lightMinLux: 100,
+  mq135MaxAdc: 180,
+  mq7MaxAdc: 270,
 } as const
 
 /** Rangos de pH para el veredicto de aptitud del suelo. */

@@ -1,4 +1,4 @@
-import { Bell, LogOut, Moon, ScrollText, Sun } from 'lucide-react'
+import { Bell, KeyRound, LogOut, Moon, ScrollText, Sun } from 'lucide-react'
 import { Link, Outlet, useNavigation } from 'react-router'
 import { BottomNav } from '@/app/layouts/BottomNav'
 import { SideNav } from '@/app/layouts/SideNav'
@@ -32,18 +32,25 @@ export function AppLayout() {
       )}
       <header className="sticky top-0 z-20 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between gap-2 border-b bg-background/90 pt-[env(safe-area-inset-top)] pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))] backdrop-blur">
         <Link to="/" className="flex min-w-0 flex-col leading-tight">
-          <span className="font-semibold">Invernadero</span>
+          <span className="truncate font-semibold">Invernadero</span>
           {profile && (
             <span className="truncate text-xs text-muted-foreground lg:hidden">
               {ROLE_LABEL[profile.role]}
             </span>
           )}
         </Link>
-        <div className="flex min-w-0 items-center gap-1">
+        <div className="flex shrink-0 items-center lg:gap-1">
           {profile && (
             <span className="hidden truncate pr-2 text-sm text-muted-foreground lg:inline">
               {profile.fullName ?? profile.email} · {ROLE_LABEL[profile.role]}
             </span>
+          )}
+          {can('access.view') && (
+            <Button variant="ghost" size="icon" asChild className="size-11 lg:hidden">
+              <Link to="/accesos" aria-label="Accesos">
+                <KeyRound />
+              </Link>
+            </Button>
           )}
           {can('audit.view') && (
             <Button variant="ghost" size="icon" asChild className="size-11 lg:hidden">

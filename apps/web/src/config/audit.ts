@@ -1,4 +1,13 @@
-import { Bell, FileText, KeyRound, Power, Settings, Users, type LucideIcon } from 'lucide-react'
+import {
+  Bell,
+  Cpu,
+  FileText,
+  KeyRound,
+  Power,
+  Settings,
+  Users,
+  type LucideIcon,
+} from 'lucide-react'
 
 /** Filtros de la Bitácora: cada categoría agrupa entidades de `audit_log`. */
 export const AUDIT_CATEGORIES = [
@@ -6,6 +15,7 @@ export const AUDIT_CATEGORIES = [
   { key: 'commands', label: 'Comandos', entities: ['commands'] },
   { key: 'alerts', label: 'Alertas', entities: ['alerts'] },
   { key: 'reports', label: 'Reportes', entities: ['report'] },
+  { key: 'access', label: 'Tarjetas', entities: ['rfid_cards'] },
   {
     key: 'admin',
     label: 'Administración',
@@ -20,7 +30,8 @@ export const AUDIT_ENTITY_ICON: Record<string, LucideIcon> = {
   alerts: Bell,
   report: FileText,
   profiles: Users,
-  devices: KeyRound,
+  devices: Cpu,
+  rfid_cards: KeyRound,
 }
 export const AUDIT_DEFAULT_ICON = Settings
 
