@@ -1,4 +1,5 @@
 import { StatusChip, type StatusTone } from '@/components/shared/StatusChip'
+import { formatUid } from '@/config/access'
 import { ALERT_TYPES_UI } from '@/config/alerts'
 import { RANGES } from '@/config/analytics'
 import { AUDIT_DEFAULT_ICON, AUDIT_ENTITY_ICON, AUDIT_SYSTEM_ACTOR } from '@/config/audit'
@@ -26,6 +27,11 @@ const str = (d: AuditEntry['details'], key: string) => {
 }
 
 const VERB: Record<string, string> = { insert: 'creado', update: 'actualizado', delete: 'borrado' }
+const CARD_VERB: Record<string, string> = {
+  insert: 'agregada',
+  update: 'actualizada',
+  delete: 'borrada',
+}
 
 const rangeLabel = (key: string | null) => RANGES.find((r) => r.key === key)?.label ?? key ?? '?'
 
@@ -97,6 +103,14 @@ function describe(e: AuditEntry, ctx: AuditContext): Described {
     }
     case 'devices':
       return { text: `Dispositivo ${str(d, 'name') ?? e.entityId} ${verb}` }
+    case 'rfid_cards': {
+      const uid = str(d, 'uid')
+      const state = e.action === 'delete' ? '' : d?.active ? ' · activa' : ' · desactivada'
+      return {
+        text: `Tarjeta de ${str(d, 'holder') ?? '?'} ${CARD_VERB[e.action] ?? e.action}${state}`,
+        ...(uid && { note: formatUid(uid) }),
+      }
+    }
     default:
       return { text: `${e.action} en ${e.entity}` }
   }

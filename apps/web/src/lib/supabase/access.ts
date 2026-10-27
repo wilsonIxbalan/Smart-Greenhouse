@@ -101,40 +101,39 @@ export async function fetchSync(deviceId: string): Promise<AccessSync | null> {
   return data ? parseOne(syncSchema, data, 'sincronización') : null
 }
 
-/** Mensajes de la base (RLS, únicos, límite del Mega) en palabras del usuario. */
+/** Mensajes de las RPC de tarjetas (rol, únicos, límite del Mega) en palabras del usuario. */
 function cardError(context: string, error: { code?: string; message: string }): Error {
   if (error.code === '23505') return new Error('Esa tarjeta ya está registrada.')
   if (error.code === '42501') return new Error('Solo el administrador puede cambiar las tarjetas.')
   if (error.message.includes('max_cards'))
     return new Error('El Mega guarda hasta 20 tarjetas activas. Desactiva o borra alguna primero.')
+  if (error.message.includes('unknown_card')) return new Error('La tarjeta ya no existe.')
   if (error.code === '23514')
     return new Error('El UID debe tener 8, 14 o 20 dígitos (4, 7 o 10 bytes).')
   return dataError(context, error)
 }
 
+/** Las tarjetas solo se cambian por RPC (solo admin; cada cambio queda en la bitácora). */
 export async function addCard(deviceId: string, uid: string, holder: string): Promise<void> {
-  const { error } = await getSupabase()
-    .from('rfid_cards')
-    .insert({ device_id: deviceId, uid, holder })
+  const { error } = await getSupabase().rpc('rfid_add_card', {
+    p_device_id: deviceId,
+    p_uid: uid,
+    p_holder: holder,
+  })
   if (error) throw cardError('No se pudo agregar la tarjeta', error)
 }
 
 export async function setCardActive(id: number, active: boolean): Promise<void> {
-  const { error, count } = await getSupabase()
-    .from('rfid_cards')
-    .update({ active }, { count: 'exact' })
-    .eq('id', id)
+  const { error } = await getSupabase().rpc('rfid_set_card_active', {
+    p_card_id: id,
+    p_active: active,
+  })
   if (error) throw cardError('No se pudo cambiar la tarjeta', error)
-  if (count === 0) throw new Error('No se guardó el cambio: tu usuario no puede editar tarjetas.')
 }
 
 export async function deleteCard(id: number): Promise<void> {
-  const { error, count } = await getSupabase()
-    .from('rfid_cards')
-    .delete({ count: 'exact' })
-    .eq('id', id)
+  const { error } = await getSupabase().rpc('rfid_delete_card', { p_card_id: id })
   if (error) throw cardError('No se pudo borrar la tarjeta', error)
-  if (count === 0) throw new Error('No se borró: tu usuario no puede editar tarjetas.')
 }
 
 interface AccessHandlers {
