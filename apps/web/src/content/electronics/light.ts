@@ -6,13 +6,13 @@ export const light: ElectronicsInfo = {
   title: 'Iluminación',
   component: {
     name: 'Sensor de luz ambiental + tira LED 12 V',
-    model: 'BH1750 (aún no instalado) · tira LED con MOSFET',
-    supply: 'BH1750: según módulo (pendiente) · tira LED: 12 V externa',
+    model: 'BH1750 · tira LED 12 V con MOSFET',
+    supply: 'BH1750: módulo en el bus I2C del Mega · tira LED: fuente externa de 12 V',
     interface: 'BH1750: I2C dirección 0x23 · LED: PWM',
     pins: 'BH1750: SDA D20 / SCL D21 · MOSFET (gate): D4',
     notes: [
-      'Con USA_BH1750 = 0 el firmware envía lux = -1 (sin sensor) y la luz no se enciende en modo automático.',
-      'Valor MEDIDO cuando el sensor exista; luz % es la salida PWM confirmada por el Mega, no luz medida.',
+      'Instalado y activo (USA_BH1750 = 1). Si el sensor deja de responder, el firmware envía lux = -1 y la luz no se enciende en automático.',
+      'lux es un valor MEDIDO; luz % es la salida PWM confirmada por el Mega, no luz medida.',
     ],
   },
   principle: [
@@ -65,14 +65,14 @@ export const light: ElectronicsInfo = {
       {
         from: 'Mega D4',
         to: 'Gate del MOSFET',
-        note: 'Resistencias de gate/pull-down según montaje (pendiente de documentar)',
+        note: 'Resistencia de gate en serie y pull-down a GND para que la tira no encienda al arrancar',
       },
       { from: 'Tira LED (−)', to: 'Drain del MOSFET' },
       { from: 'Source del MOSFET', to: 'GND común con el Mega' },
     ],
   },
   commonErrors: [
-    'Interpretar lux = -1 como oscuridad: significa "sin sensor".',
+    'Interpretar lux = -1 como oscuridad: significa que el sensor no respondió.',
     'No unir las tierras de la fuente de 12 V y del Mega: el MOSFET no conmuta.',
     'Creer que luz % mide la iluminación: es la salida PWM aplicada.',
   ],

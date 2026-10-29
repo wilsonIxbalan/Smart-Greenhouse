@@ -10,7 +10,7 @@ export const soilMoisture: ElectronicsInfo = {
   component: {
     name: 'Sensor de suelo 7-en-1 (principal) + sensor capacitivo (respaldo)',
     model: '7-en-1 RS485 Modbus RTU · capacitivo analógico',
-    supply: '7-en-1: según su hoja técnica (pendiente de confirmar) · capacitivo: 5 V del Mega',
+    supply: '7-en-1: fuente DC externa según su hoja técnica · capacitivo: 5 V del Mega',
     interface: '7-en-1: RS485 (holding register 1) · capacitivo: salida analógica al ADC',
     pins: '7-en-1: Serial2 (TX2 D16 / RX2 D17) vía MAX485, DE/RE en D7 · capacitivo: A0',
     notes: [
