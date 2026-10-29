@@ -26,7 +26,7 @@ export const soil7in1: ElectronicsInfo = {
   component: {
     name: 'Sensor de suelo multiparámetro',
     model: '7-en-1 RS485 Modbus RTU + transceptor MAX485',
-    supply: 'Según hoja técnica del sensor (pendiente de confirmar); MAX485 a 5 V',
+    supply: 'Fuente DC externa según su hoja técnica; MAX485 a 5 V del Mega',
     interface: 'RS485 half-duplex, Modbus RTU, 9600 baud, dirección 2',
     pins: 'Serial2: TX2 D16 → DI, RX2 D17 ← RO · DE+RE → D7',
     notes: [

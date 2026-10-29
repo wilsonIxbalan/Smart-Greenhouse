@@ -38,8 +38,7 @@ export const HARDWARE_COMPONENTS = [
     role: 'Luz artificial',
     iface: 'PWM (analogWrite 0–255)',
     pin: 'D4',
-    principle:
-      'Conmutación por PWM: el ciclo de trabajo fija la tensión media. Modelo de MOSFET pendiente (Q-26).',
+    principle: 'Conmutación por PWM: el ciclo de trabajo fija la tensión media..',
     infoKey: 'light',
   },
   {
@@ -127,7 +126,7 @@ export const HARDWARE_COMPONENTS = [
     iface: 'Analógica (ADC)',
     pin: 'A2',
     principle:
-      'Óxido metálico: Rs baja con los gases; divisor con RL. RL y precalentamiento pendientes (Q-26).',
+      'Óxido metálico: Rs baja con los gases; divisor con RL integrada en el módulo; 60 s de precalentamiento.',
     infoKey: 'air-quality',
   },
   {
@@ -137,12 +136,12 @@ export const HARDWARE_COMPONENTS = [
     iface: 'Analógica (ADC)',
     pin: 'A3',
     principle:
-      'Óxido metálico: Rs baja con el CO; divisor con RL. RL y precalentamiento pendientes (Q-26).',
+      'Óxido metálico: Rs baja con el CO; divisor con RL integrada en el módulo; 60 s de precalentamiento. Lectura desactivada (USA_MQ7 = 0) hasta reemplazar el módulo.',
     infoKey: 'air-quality',
   },
   {
     key: 'lcd',
-    name: 'LCD 20x4 I2C',
+    name: 'LCD 16x2 I2C',
     role: 'Pantalla local',
     iface: 'I2C (0x27)',
     pin: 'SDA D20 · SCL D21',
@@ -154,10 +153,8 @@ export const HARDWARE_COMPONENTS = [
     role: 'Iluminancia',
     iface: 'I2C (0x23)',
     pin: 'SDA D20 · SCL D21',
-    principle:
-      'Fotodiodo + ADC interno de 16 bits. Sin instalar (USA_BH1750 = 0); alimentación pendiente (Q-26).',
+    principle: 'Fotodiodo + ADC interno de 16 bits..',
     infoKey: 'light',
-    status: 'pendiente',
   },
   {
     key: 'soil7',
@@ -166,7 +163,7 @@ export const HARDWARE_COMPONENTS = [
     iface: 'RS-485 Modbus (dir. 2)',
     pin: 'Vía MAX485 (A/B)',
     principle:
-      'Electrodos + conductividad; respuesta Modbus RTU a 9600. NPK estimado a partir de EC. Alimentación pendiente (Q-26).',
+      'Electrodos + conductividad; respuesta Modbus RTU a 9600. NPK estimado a partir de EC.',
     infoKey: 'soil-7in1',
   },
   {
@@ -177,6 +174,15 @@ export const HARDWARE_COMPONENTS = [
     pin: 'TX1 D18 · RX1 D19',
     principle:
       'Recibe JSON por UART y lo publica por HTTPS. El TXS0108E adapta niveles: 5 V del Mega ↔ 3,3 V del ESP32.',
+  },
+  {
+    key: 'rc522',
+    name: 'Lector RFID RC522',
+    role: 'Abre la puerta con tarjeta',
+    iface: 'SPI (13,56 MHz)',
+    pin: 'RST D49 · MISO D50 · MOSI D51 · SCK D52 · SS D53',
+    principle:
+      'La antena induce energía en la tarjeta y lee su UID por acoplamiento magnético. Trabaja a 3,3 V: SS, SCK, MOSI y RST pasan por el TXS0108E.',
   },
 ] as const satisfies readonly HardwareComponent[]
 
