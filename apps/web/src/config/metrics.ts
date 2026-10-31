@@ -128,21 +128,21 @@ export const METRICS = [
   },
   {
     key: 'soilPh',
-    label: 'Suelo 7 en 1 · pH',
+    label: 'Suelo 7 en 1 · pH aprox.',
     unit: 'pH',
     tone: 'primary',
     infoKey: 'soil-7in1',
     decimals: 1,
     select: (f) => (f.suelo_ok && f.ph !== undefined ? f.ph : null),
     availability: soil7,
-    badge: (f) => APTITUDE_BADGE[soilVerdict(f.suelo_ok ? f.ph : null)],
+    badge: (f) => APTITUDE_BADGE[soilVerdict(f)],
     details: (f) => [
       { label: 'EC', value: `${opt(f.ec)} µS/cm` },
       { label: 'N', value: `${opt(f.n)} mg/kg` },
       { label: 'P', value: `${opt(f.p)} mg/kg` },
       { label: 'K', value: `${opt(f.k)} mg/kg` },
     ],
-    note: 'NPK orientativo: el sensor lo estima a partir de la conductividad.',
+    note: 'pH aproximado sin calibrar (registro 7 del sensor). NPK orientativo: el sensor lo estima a partir de la conductividad.',
   },
 ] as const satisfies readonly MetricDef[]
 

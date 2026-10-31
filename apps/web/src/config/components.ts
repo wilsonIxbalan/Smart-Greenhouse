@@ -136,7 +136,7 @@ export const HARDWARE_COMPONENTS = [
     iface: 'Analógica (ADC)',
     pin: 'A3',
     principle:
-      'Óxido metálico: Rs baja con el CO; divisor con RL integrada en el módulo; 60 s de precalentamiento. Lectura desactivada (USA_MQ7 = 0) hasta reemplazar el módulo.',
+      'Óxido metálico: Rs baja con el CO; divisor con RL integrada en el módulo; 60 s de precalentamiento..',
     infoKey: 'air-quality',
   },
   {
@@ -159,7 +159,7 @@ export const HARDWARE_COMPONENTS = [
   {
     key: 'soil7',
     name: 'Sensor de suelo 7 en 1',
-    role: 'pH, EC, NPK, humedad y temperatura',
+    role: 'pH aprox., EC, NPK, humedad y temperatura',
     iface: 'RS-485 Modbus (dir. 2)',
     pin: 'Vía MAX485 (A/B)',
     principle:

@@ -9,10 +9,11 @@ export const THRESHOLDS = {
   mq7MaxAdc: 270,
 } as const
 
-/** Rangos de pH para el veredicto de aptitud del suelo. */
-export const SOIL_PH = {
-  apt: { min: 6.0, max: 7.5 },
-  regular: { min: 5.5, max: 8.0 },
+/** Aptitud del suelo del Mega v3 (demo, Q-15): la peor de tres señales. Igualar a mano con el `.ino`. */
+export const SOIL_RULES = {
+  ec: { aptMin: 100, aptMax: 2500, regMax: 4000 },
+  hum: { aptMin: 20, aptMax: 80, regMin: 10, regMax: 90 },
+  acid: { aptMin: 5.5, regMin: 4.5 },
 } as const
 
 /** Electrónica del Mega: ADC de 10 bits referido a 5 V. */

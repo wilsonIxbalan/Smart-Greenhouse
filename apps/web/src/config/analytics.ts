@@ -39,7 +39,7 @@ const SERIES: SeriesConfig[] = [
   { metric: 'light', avg: 'lux_avg' },
   { metric: 'mq135', avg: 'mq135_avg', max: 'mq135_max', breach: 'above' },
   { metric: 'mq7', avg: 'co_avg', max: 'co_max', breach: 'above' },
-  { metric: 'soilPh', label: 'pH del suelo', avg: 'ph_avg' },
+  { metric: 'soilPh', label: 'pH aprox. del suelo (sin calibrar)', avg: 'ph_avg' },
 ]
 
 export type AnalyticsSeries = Omit<SeriesConfig, 'label'> &

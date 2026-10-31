@@ -11,18 +11,12 @@ export function crc16Modbus(bytes: number[]): number {
   return crc
 }
 
-export function phAptitude(ph: number): 'APTO' | 'REGULAR' | 'NO_APTO' {
-  if (ph >= 6.0 && ph <= 7.5) return 'APTO'
-  if (ph >= 5.5 && ph <= 8.0) return 'REGULAR'
-  return 'NO_APTO'
-}
-
 const h2 = (n: number) => n.toString(16).toUpperCase().padStart(2, '0')
-export const REQUEST = [0x02, 0x03, 0x00, 0x00, 0x00, 0x07]
+export const REQUEST = [0x02, 0x03, 0x00, 0x00, 0x00, 0x08]
 
 export const soil7in1: ElectronicsInfo = {
   key: 'soil-7in1',
-  title: 'Suelo 7-en-1 (temperatura, humedad, EC, pH, NPK)',
+  title: 'Suelo 7-en-1 (temperatura, humedad, EC, pH aprox., NPK)',
   component: {
     name: 'Sensor de suelo multiparámetro',
     model: '7-en-1 RS485 Modbus RTU + transceptor MAX485',
@@ -30,22 +24,23 @@ export const soil7in1: ElectronicsInfo = {
     interface: 'RS485 half-duplex, Modbus RTU, 9600 baud, dirección 2',
     pins: 'Serial2: TX2 D16 → DI, RX2 D17 ← RO · DE+RE → D7',
     notes: [
-      'Temperatura, humedad, EC y pH: MEDIDOS por el sensor.',
+      'Temperatura, humedad y EC: MEDIDOS por el sensor.',
+      'pH APROXIMADO sin calibrar: el electrodo de pH (registro 3) siempre da 0, así que se usa el registro 7, que sí reacciona a la acidez (tierra o agua ≈ 6.2–6.4, vinagre ≈ 4.0) pero no a lo alcalino.',
       'N, P, K: ESTIMADOS internamente a partir de la EC (no hay sensor químico de nutrientes) → solo orientativos.',
     ],
   },
   principle: [
     'RS485 transmite cada bit como diferencia de voltaje entre las líneas A y B; el ruido común se cancela, por eso aguanta cables largos en campo.',
     'Es half-duplex: el Mega pone D7 en alto para transmitir la petición y en bajo para escuchar la respuesta del sensor.',
-    'Modbus RTU: el Mega pide 7 holding registers desde el 0 (función 03) y el sensor responde con 14 bytes de datos; un CRC-16 detecta errores de transmisión.',
+    'Modbus RTU: el Mega pide 8 holding registers desde el 0 (función 03) y el sensor responde con 16 bytes de datos (21 con cabecera y CRC); un CRC-16 detecta errores de transmisión.',
   ],
   formula: {
-    general: String.raw`T=\tfrac{reg_0}{10},\ H=\tfrac{reg_1}{10},\ EC=reg_2,\ pH=\tfrac{reg_3}{10},\ N,P,K=reg_{4..6}`,
+    general: String.raw`T=\tfrac{reg_0}{10},\ H=\tfrac{reg_1}{10},\ EC=reg_2,\ N,P,K=reg_{4..6},\ pH_{aprox}=\tfrac{reg_7}{10}`,
     variables: [
       { symbol: 'reg_0', meaning: 'Temperatura de suelo × 10 (°C)' },
       { symbol: 'reg_1', meaning: 'Humedad de suelo × 10 (%)' },
       { symbol: 'reg_2', meaning: 'Conductividad eléctrica (µS/cm)' },
-      { symbol: 'reg_3', meaning: 'pH × 10' },
+      { symbol: 'reg_7', meaning: 'Indicador de acidez × 10 (pH aproximado, sin calibrar)' },
       { symbol: 'reg_{4..6}', meaning: 'N, P, K en mg/kg (estimados por EC)' },
     ],
     compute: (frame) => {
@@ -64,18 +59,18 @@ export const soil7in1: ElectronicsInfo = {
       const reqHex = [...REQUEST, crc & 0xff, crc >> 8].map(h2).join('\\ ')
       const r0 = Math.round(suelo_t * 10)
       const r1 = Math.round(frame.suelo_h * 10)
-      const r3 = Math.round(ph * 10)
+      const r7 = Math.round(ph * 10)
       return [
         {
           tex: String.raw`\text{Petición: } \texttt{${reqHex}}`,
-          note: 'Dirección 02, función 03, registro 0000, cantidad 0007, CRC-16 (byte bajo primero).',
+          note: 'Dirección 02, función 03, registro 0000, cantidad 0008, CRC-16 (byte bajo primero).',
         },
         { tex: String.raw`T = \frac{${r0}}{10} = ${fx(r0 / 10, 1)}\ ^\circ\mathrm{C}` },
         { tex: String.raw`H = \frac{${r1}}{10} = ${fx(r1 / 10, 1)}\ \%` },
         { tex: String.raw`EC = ${ec}\ \mu\mathrm{S/cm}` },
         {
-          tex: String.raw`pH = \frac{${r3}}{10} = ${fx(r3 / 10, 1)} \Rightarrow \text{${phAptitude(r3 / 10)}}`,
-          note: 'APTO 6.0–7.5 · REGULAR 5.5–8.0 · fuera: NO APTO.',
+          tex: String.raw`pH_{aprox} = \frac{${r7}}{10} = ${fx(r7 / 10, 1)} \Rightarrow \text{${frame.aptitud ?? 'SIN_LECTURA'}}`,
+          note: 'Aptitud que decidió el Mega: la peor de EC, humedad y acidez (tabla de verdad en la página Electrónica).',
         },
         {
           tex: String.raw`N=${n},\ P=${p},\ K=${k}\ \mathrm{mg/kg}`,
@@ -85,22 +80,29 @@ export const soil7in1: ElectronicsInfo = {
     },
   },
   signalPath: [
-    { stage: 'Electrodos en el suelo', detail: 'Miden temperatura, humedad, conductividad y pH.' },
+    {
+      stage: 'Electrodos en el suelo',
+      detail: 'Miden temperatura, humedad, conductividad y un indicador de acidez.',
+    },
     {
       stage: 'MCU del sensor',
-      detail: 'Calcula valores y estima NPK desde la EC; los guarda en registros 0–6.',
+      detail: 'Calcula valores y estima NPK desde la EC; los guarda en los registros 0–7.',
     },
     {
       stage: 'Mega → MAX485 (D7 alto)',
       detail: 'Envía la petición Modbus por Serial2 a 9600 baud.',
     },
-    { stage: 'Sensor → MAX485 (D7 bajo)', detail: 'Responde con los 7 registros + CRC.' },
+    { stage: 'Sensor → MAX485 (D7 bajo)', detail: 'Responde con los 8 registros + CRC.' },
     {
       stage: 'Mega',
       detail:
-        'Verifica CRC (librería ModbusMaster); si falla, suelo_ok = 0 y conserva el último valor.',
+        'Verifica dirección, función, largo y CRC (lectura Modbus propia, sin librería); si falla, suelo_ok = 0.',
     },
-    { stage: 'Trama', detail: 'suelo_t, suelo_h, ec, ph, n, p, k y aptitud.' },
+    {
+      stage: 'Trama',
+      detail:
+        'suelo_t, suelo_h, ec, ph (aprox.), n, p, k y aptitud (la peor de EC, humedad y acidez).',
+    },
   ],
   circuit: {
     summary: 'El MAX485 traduce entre UART TTL del Mega y el par diferencial A/B del sensor.',
@@ -116,6 +118,7 @@ export const soil7in1: ElectronicsInfo = {
     'Invertir A y B: no hay respuesta (timeout) y suelo_ok = 0.',
     'No conmutar DE/RE a tiempo: el Mega escucha su propia petición o pierde el inicio de la respuesta.',
     'Presentar NPK como medición: el sensor los estima por EC.',
-    'Olvidar dividir entre 10 temperatura, humedad y pH.',
+    'Olvidar dividir entre 10 temperatura, humedad y acidez.',
+    'Presentar el pH aproximado como pH real: no está calibrado y no detecta suelos alcalinos.',
   ],
 }
