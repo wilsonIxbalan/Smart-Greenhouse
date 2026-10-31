@@ -35,7 +35,6 @@ export const airQuality: ElectronicsInfo = {
     notes: [
       'Se muestran CUENTAS ADC SIN CALIBRAR (0–1023), no ppm.',
       'Requieren precalentamiento: el firmware ignora los MQ el primer minuto tras encender.',
-      'MQ-7 instalado, con la lectura desactivada (USA_MQ7 = 0) hasta reemplazar el módulo dañado: co llega en 0. El MQ-135 sigue activo.',
     ],
   },
   principle: [

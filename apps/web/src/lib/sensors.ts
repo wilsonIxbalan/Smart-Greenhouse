@@ -1,5 +1,5 @@
-import type { SoilAptitude } from '@inv/contracts'
-import { ADC, SOIL_PH, STALE_AFTER_MS } from '@/config/thresholds'
+import type { SoilAptitude, Telemetry } from '@inv/contracts'
+import { ADC, STALE_AFTER_MS } from '@/config/thresholds'
 
 const clampCount = (adc: number) => Math.min(ADC.maxCount, Math.max(0, adc))
 
@@ -23,12 +23,10 @@ export function isStale(
   return now - receivedAt > maxAgeMs
 }
 
-/** Veredicto de aptitud por pH. Sin lectura (o sensor en falla) → SIN_LECTURA. */
-export function soilVerdict(ph: number | null | undefined): SoilAptitude {
-  if (ph === null || ph === undefined || Number.isNaN(ph)) return 'SIN_LECTURA'
-  if (ph >= SOIL_PH.apt.min && ph <= SOIL_PH.apt.max) return 'APTO'
-  if (ph >= SOIL_PH.regular.min && ph <= SOIL_PH.regular.max) return 'REGULAR'
-  return 'NO_APTO'
+/** Veredicto del Mega (él decide la aptitud). Sin lectura o sensor en falla → SIN_LECTURA. */ export function soilVerdict(
+  f: Pick<Telemetry, 'suelo_ok' | 'aptitud'>,
+): SoilAptitude {
+  return f.suelo_ok === 1 ? (f.aptitud ?? 'SIN_LECTURA') : 'SIN_LECTURA'
 }
 
 /** "hace X" en español para una antigüedad en milisegundos. */

@@ -1,9 +1,11 @@
 import type { SoilAptitude, Telemetry } from '@inv/contracts'
 import { SectionHeader } from '@/components/shared/SectionHeader'
 import { StatusChip, type StatusTone } from '@/components/shared/StatusChip'
-import { SOIL_PH } from '@/config/thresholds'
+import { SOIL_RULES } from '@/config/thresholds'
 import { soilVerdict } from '@/lib/sensors'
 import { cn } from '@/lib/utils'
+
+const { ec, hum, acid } = SOIL_RULES
 
 const ROWS: readonly {
   verdict: SoilAptitude
@@ -18,29 +20,34 @@ const ROWS: readonly {
     label: 'Sin lectura',
   },
   {
-    verdict: 'APTO',
-    condition: `${SOIL_PH.apt.min.toFixed(1)} ≤ pH ≤ ${SOIL_PH.apt.max.toFixed(1)}`,
-    tone: 'ok',
-    label: 'Apto',
+    verdict: 'NO_APTO',
+    condition: `Alguna fuera de rango: EC < ${ec.aptMin} o > ${ec.regMax} µS/cm · humedad < ${hum.regMin} o > ${hum.regMax} % · acidez < ${acid.regMin.toFixed(1)}`,
+    tone: 'critical',
+    label: 'No apto',
   },
   {
     verdict: 'REGULAR',
-    condition: `${SOIL_PH.regular.min.toFixed(1)} ≤ pH ≤ ${SOIL_PH.regular.max.toFixed(1)} (fuera de apto)`,
+    condition: `Alguna en regular: EC ${ec.aptMax}–${ec.regMax} µS/cm · humedad ${hum.regMin}–${hum.aptMin} o ${hum.aptMax}–${hum.regMax} % · acidez ${acid.regMin.toFixed(1)}–${acid.aptMin.toFixed(1)}`,
     tone: 'warning',
     label: 'Regular',
   },
-  { verdict: 'NO_APTO', condition: 'Cualquier otro pH', tone: 'critical', label: 'No apto' },
+  {
+    verdict: 'APTO',
+    condition: `Las tres bien: EC ${ec.aptMin}–${ec.aptMax} µS/cm · humedad ${hum.aptMin}–${hum.aptMax} % · acidez ≥ ${acid.aptMin.toFixed(1)}`,
+    tone: 'ok',
+    label: 'Apto',
+  },
 ]
 
 export function SoilTruthTable({ frame }: { frame: Telemetry | null }) {
-  const live = frame ? soilVerdict(frame.suelo_ok ? frame.ph : null) : null
+  const live = frame ? soilVerdict(frame) : null
   return (
     <section aria-label="Veredicto de suelo" data-testid="section-soil" className="space-y-3">
       <SectionHeader
         title="Tabla de verdad: veredicto de suelo"
         description={
-          frame?.suelo_ok && frame.ph !== undefined
-            ? `Lectura viva: pH ${frame.ph.toFixed(1)}`
+          frame?.suelo_ok
+            ? `Lectura viva: EC ${frame.ec ?? '—'} µS/cm · humedad ${frame.suelo_h} % · acidez ${frame.ph?.toFixed(1) ?? '—'}`
             : 'Fila resaltada: la lectura viva.'
         }
       />
@@ -79,7 +86,10 @@ export function SoilTruthTable({ frame }: { frame: Telemetry | null }) {
           </tbody>
         </table>
       </div>
-      <p className="text-xs text-muted-foreground">Regla en revisión (Q-23).</p>
+      <p className="text-xs text-muted-foreground">
+        El Mega decide: gana la peor de las tres señales. La acidez es el registro 7 del sensor
+        (aproximado, sin calibrar). Umbrales de demo hasta definir el cultivo (Q-15).
+      </p>
     </section>
   )
 }

@@ -27,10 +27,13 @@ function noise(seed: number, i: number): number {
 const round = (x: number, d = 0) => Math.round(x * 10 ** d) / 10 ** d
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x))
 
-function aptitude(ph: number): SoilAptitude {
-  if (ph >= 6.0 && ph <= 7.5) return 'APTO'
-  if (ph >= 5.5 && ph <= 8.0) return 'REGULAR'
-  return 'NO_APTO'
+/** Igual que el Mega v3: la peor de EC, humedad de suelo e indicador de acidez (0 apto, 1 regular, 2 no apto). */
+function aptitude(ec: number, hum: number, acid: number): SoilAptitude {
+  const lEc = ec >= 100 && ec <= 2500 ? 0 : ec > 2500 && ec <= 4000 ? 1 : 2
+  const lHum = hum >= 20 && hum <= 80 ? 0 : hum >= 10 && hum <= 90 ? 1 : 2
+  const lAcid = acid >= 5.5 ? 0 : acid >= 4.5 ? 1 : 2
+  const worst = Math.max(lEc, lHum, lAcid)
+  return worst === 0 ? 'APTO' : worst === 1 ? 'REGULAR' : 'NO_APTO'
 }
 
 /**
@@ -63,6 +66,8 @@ export function generateTelemetry(seed: number, t: number, opts: GeneratorOption
 
   const sueloOk = scenario !== 'falla_suelo'
   const ph = round(6.4 + n(4) * 0.05, 1)
+  const ec = Math.round(1200 + 80 * n(9))
+  const sueloHumedad = round(clamp(sueloH + n(7) * 0.5, 0, 100))
   const aire = Math.round(clamp(120 + 20 * n(5) + (scenario === 'co_alto' ? 140 : 0), 0, 1023))
   const co = Math.round(clamp(90 + 10 * n(6) + (scenario === 'co_alto' ? 200 : 0), 0, 1023))
 
@@ -76,15 +81,15 @@ export function generateTelemetry(seed: number, t: number, opts: GeneratorOption
     aire_t: aireT,
     aire_h: aireH,
     dht_ok: 1,
-    suelo_h: round(clamp(sueloH + n(7) * 0.5, 0, 100)),
+    suelo_h: sueloHumedad,
     suelo_t: round(20 + 5 * daylight + n(8) * 0.2, 1),
     ph,
-    ec: Math.round(1200 + 80 * n(9)),
+    ec,
     n: Math.round(34 + 2 * n(10)),
     p: Math.round(12 + n(11)),
     k: Math.round(40 + 2 * n(12)),
     suelo_ok: sueloOk ? 1 : 0,
-    aptitud: sueloOk ? aptitude(ph) : 'SIN_LECTURA',
+    aptitud: sueloOk ? aptitude(ec, sueloHumedad, ph) : 'SIN_LECTURA',
     lux,
     aire_mq135: aire,
     co,
